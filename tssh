@@ -25,9 +25,9 @@ OPTIONS
    -v  verbose
    -h  help
 
-DEPEND
+DEPENDS
    On Debian, you need the package
-   
+
     apt-get install tmux ncurses-bin wamerican nmap
 
    wamerican (or wfrench...) is used to choose a random word in the file /usr/share/dict/words
@@ -36,6 +36,10 @@ DEPEND
    to automatically split your terminal into several small panels.
    nmap is only used for dynamic DNS domain and dynamic scan.
    This is not mandatory for general use.
+
+   By default, tssh use tput to know the number of columns and lines of your terminal.
+   It takes 10 lines and 40 columns for each windows by default.
+   If tput is not installed, the default is 16 windows...
 
 AUTHOR
    Gabriel Moreau
@@ -46,6 +50,7 @@ COPYRIGHT
 END_USAGE
    }
 
+export remote_command=''
 export split_number=16
 if which tput > /dev/null
 then
@@ -60,13 +65,22 @@ fi
 
 # get options
 if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:fvh" options
+while getopts "w:c:fvh" options
 do
    case ${options} in
       w)
          if echo ${OPTARG} | egrep -q '^[[:digit:]]+$' && [ ${OPTARG} -gt 0 ]
          then
             export split_number=${OPTARG}
+         else
+            usage
+            exit 2
+         fi
+         ;;
+      c)
+         if echo ${OPTARG} | egrep -q '[[:alpha:]]'
+         then
+            export remote_command=${OPTARG}
          else
             usage
             exit 2
@@ -159,12 +173,12 @@ do
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
-   tmux -2 new-session -d -s $session "ssh ${host[0]}"
+   tmux -2 new-session -d -s $session "ssh ${host[0]} ${remote_command}"
 
 
    for (( i=1 ; i < ${#host[@]} ; i++))
    do
-      tmux splitw -t $session "ssh ${host[$i]}"
+      tmux splitw -t $session "ssh ${host[$i]} ${remote_command}"
       tmux select-layout tiled
    done
 
