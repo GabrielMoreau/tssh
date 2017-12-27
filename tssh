@@ -121,7 +121,7 @@ get_host_list () {
          host="${host:0:${#host}-1}"
       fi
 
-      cluster=$(grep "^${host}" ${HOME}/.csshrc | cut -f 2 -d '=')
+      cluster=$(grep "^${host#*@}\b" ${HOME}/.csshrc | cut -f 2 -d '=')
       if [ "${cluster}" == "" ]
       then
          if [ "${fast}" != 'yes' ]
@@ -139,8 +139,8 @@ get_host_list () {
                   [ "${verbose}" == "yes" ] && echo Warning: ${host#*@} is down
                   continue
                else
-                  host=${host}.${dyn_domain}
-                  ssh-keygen -q -R $(LANG=C host ${host} | awk '{print $4}')
+                  host=${host#*@}.${dyn_domain}
+                  ssh-keygen -q -R $(LANG=C host ${host#*@} | awk '{print $4}')
                fi
             fi
          fi
