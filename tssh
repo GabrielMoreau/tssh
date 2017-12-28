@@ -179,6 +179,13 @@ sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_pa
 # loop on each split windows
 for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
 do
+   if [ "${verbose}" == 'yes' ]
+   then
+      echo Info: next host to be splitted
+      cat "/tmp/${base_path}/${f}"
+      sleep 5
+   fi
+
    session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
