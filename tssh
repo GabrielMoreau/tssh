@@ -123,7 +123,7 @@ get_host_list () {
    for host in $*
    do
       local mode=${default_mode}
-      local -r last_char="${host: -1}"
+      local last_char="${host: -1}"
       if [ "${last_char}" == "-" -o "${last_char}" == "+" ]
       then
          mode="${last_char}"
@@ -131,7 +131,7 @@ get_host_list () {
       fi
 
       # short host without login part if any
-      local -r justhost=${host#*@}
+      local justhost=${host#*@}
       
       cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=')
       if [ "${cluster}" == "" ]
@@ -195,7 +195,7 @@ do
       sleep 5
    fi
 
-   local -r session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
+   session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
