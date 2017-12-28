@@ -5,7 +5,7 @@
 # From http://hd-recording.at/dokuwiki/doku.php?id=linux:tmux#tssh
 
 # Clean when Ctrl^C
-trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"' QUIT
+trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"; exit 4;' QUIT INT TERM
 
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
