@@ -137,7 +137,7 @@ get_host_list () {
       if [ "${cluster}" == "" ]
       then
          # just a host to scan and add
-         if [ "${fast}" != 'yes' ]
+         if [ "${fast}" != 'yes' -a "${mode}" != '-' ]
          then
             # test if exists host
             if host ${justhost} | grep -q 'not found'
