@@ -184,6 +184,8 @@ do
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
    tmux -2 new-session -d -s $session "ssh ${host[0]} ${remote_command}"
+   # wait 1s to let new session start...
+   sleep 1
 
    for (( i=1 ; i < ${#host[@]} ; i++))
    do
