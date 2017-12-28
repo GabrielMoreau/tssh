@@ -133,7 +133,7 @@ get_host_list () {
       # short host without login part if any
       local justhost=${host#*@}
       
-      cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=')
+      cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=' | sed -e 's/^[[:space:]]*//;')
       if [ "${cluster}" == "" ]
       then
          # just a host to scan and add
