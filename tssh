@@ -111,10 +111,19 @@ touch "/tmp/${base_path}/master++"
 
 get_host_list () {
    local cluster
+   local default_mode=''
+
+   # set local mode
+   if echo $1 | grep -- ^--mode=
+   then
+      default_mode=$(echo $1 | grep -- ^--mode= | cut -f 2 -d '=')
+      shift
+   fi
+
    for host in $*
    do
-      mode=""
-      last_char="${host: -1}"
+      local mode=${default_mode}
+      local -r last_char="${host: -1}"
       if [ "${last_char}" == "-" -o "${last_char}" == "+" ]
       then
          mode="${last_char}"
@@ -122,7 +131,7 @@ get_host_list () {
       fi
 
       # short host without login part if any
-      justhost=${host#*@}
+      local -r justhost=${host#*@}
       
       cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=')
       if [ "${cluster}" == "" ]
@@ -154,7 +163,7 @@ get_host_list () {
       else
          # cluster, jump in a recursive mode
          [ "${verbose}" == 'yes' ] && echo Warning: recursive mode for cluster ${cluster} with mode ${mode}
-         cluster=$(get_host_list "${cluster}${mode}")
+         cluster=$(get_host_list --mode=${mode} "${cluster}")
       fi
    done
    }
@@ -186,7 +195,7 @@ do
       sleep 5
    fi
 
-   session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
+   local -r session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
