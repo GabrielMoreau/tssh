@@ -121,31 +121,39 @@ get_host_list () {
          host="${host:0:${#host}-1}"
       fi
 
-      cluster=$(grep "^${host#*@}\b" ${HOME}/.csshrc | cut -f 2 -d '=')
+      # short host without login part if any
+      justhost=${host#*@}
+      
+      cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=')
       if [ "${cluster}" == "" ]
       then
+         # just a host to scan and add
          if [ "${fast}" != 'yes' ]
          then
-            # short host without login part if any
-            if host ${host#*@} | grep -q 'not found'
+            # test if exists host
+            if host ${justhost} | grep -q 'not found'
             then
-               [ "${verbose}" == "yes" ] && echo Warning: ${host#*@} does not exists
+               [ "${verbose}" == 'yes' ] && echo Warning: ${justhost} does not exists
                continue
             fi
-            if ! nmap -p 22 -sT -PN ${host#*@} | grep -q '\bopen\b'
+            if ! nmap -p 22 -sT -PN ${justhost} | grep -q '\bopen\b'
             then
-               if host ${host#*@}.${dyn_domain} | grep -q 'not found' || ! nmap -p 22 -sT -PN ${host#*@}.${dyn_domain} | grep -q '\bopen\b'
+               if host ${justhost}.${dyn_domain} | grep -q 'not found' || ! nmap -p 22 -sT -PN ${justhost}.${dyn_domain} | grep -q '\bopen\b'
                then
-                  [ "${verbose}" == "yes" ] && echo Warning: ${host#*@} is down
+                  [ "${verbose}" == 'yes' ] && echo Warning: ${justhost} is down
                   continue
                else
-                  host=${host#*@}.${dyn_domain}
-                  ssh-keygen -q -R $(LANG=C host ${host#*@} | awk '{print $4}')
+                  [ "${verbose}" == 'yes' ] && echo Warning: remove ssh key of ${justhost}.${dyn_domain}
+                  host=${justhost}.${dyn_domain}
+                  ssh-keygen -q -R $(LANG=C host ${justhost} | awk '{print $4}')
                fi
             fi
          fi
+         [ "${verbose}" == 'yes' ] && echo Warning: add ${host} on list with mode ${mode}
          echo "${host}" >> "/tmp/${base_path}/master${mode}"
       else
+         # cluster, jump in a recursive mode
+         [ "${verbose}" == 'yes' ] && echo Warning: recursive mode for cluster ${cluster} with mode ${mode}
          cluster=$(get_host_list "${cluster}${mode}")
       fi
    done
