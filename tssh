@@ -173,16 +173,17 @@ do
    echo "${f}" >> "/tmp/${base_path}/master++"
 done
 
-sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/_
+# split master list in paquet of split_number computer
+sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
 
-for f in $(ls -1 /tmp/${base_path}/ | grep -v ^master)
+# loop on each split windows
+for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
 do
    session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
    tmux -2 new-session -d -s $session "ssh ${host[0]} ${remote_command}"
-
 
    for (( i=1 ; i < ${#host[@]} ; i++))
    do
