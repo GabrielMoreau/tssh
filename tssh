@@ -162,7 +162,7 @@ get_host_list () {
          echo "${host}" >> "/tmp/${base_path}/master${mode}"
       else
          # cluster, jump in a recursive mode
-         [ "${verbose}" == 'yes' ] && echo Warning: recursive mode for cluster ${cluster} with mode ${mode}
+         [ "${verbose}" == 'yes' ] && echo Warning: recursive call for cluster: ${cluster}, with mode ${mode}
          cluster=$(get_host_list --mode=${mode} "${cluster}")
       fi
    done
@@ -190,8 +190,8 @@ for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
 do
    if [ "${verbose}" == 'yes' ]
    then
-      echo Info: next host to be splitted
-      cat "/tmp/${base_path}/${f}"
+      echo Info: next hosts to be splitted
+      cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;'
       sleep 5
    fi
 
