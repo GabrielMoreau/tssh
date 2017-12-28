@@ -162,7 +162,7 @@ get_host_list () {
          echo "${host}" >> "/tmp/${base_path}/master${mode}"
       else
          # cluster, jump in a recursive mode
-         [ "${verbose}" == 'yes' ] && echo Warning: recursive call for cluster: ${cluster}, with mode ${mode}
+         [ "${verbose}" == 'yes' ] && echo Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}
          cluster=$(get_host_list --mode=${mode} "${cluster}")
       fi
    done
