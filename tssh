@@ -193,7 +193,7 @@ if [ -n "${remote_command}" ]
 then
    # add tempo after remote command
    other_tempo=${tempo}
-   first_tempo=$((${tempo} + ${other_tempo}))
+   first_tempo="${tempo} ${other_tempo}"
 fi
 
 # loop on each split windows
