@@ -185,6 +185,17 @@ done
 # split master list in paquet of split_number computer
 sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
 
+# wait is needed by time tmux session open and ssh time connection
+tempo=0.8
+first_tempo=0
+other_tempo=0
+if [ -n "${remote_command}" ]
+then
+   # add tempo after remote command
+   other_tempo=${tempo}
+   first_tempo=$((${tempo} + ${other_tempo}))
+fi
+
 # loop on each split windows
 for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
 do
@@ -199,13 +210,14 @@ do
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
-   tmux -2 new-session -d -s $session "ssh ${host[0]} ${remote_command}"
-   # wait 1s to let new session start...
-   sleep 1
+   tmux -2 new-session -d -s $session "ssh ${host[0]} ${remote_command}; sleep ${first_tempo}"
+   # wait ${tempo} second to let new session start...
+   sleep ${tempo}
 
    for (( i=1 ; i < ${#host[@]} ; i++))
    do
-      tmux splitw -t $session "ssh ${host[$i]} ${remote_command}"
+      # wait ${tempo} needed in case of ${remote_command}
+      tmux splitw -t $session "ssh ${host[$i]} ${remote_command}; sleep ${other_tempo}"
       tmux select-layout tiled
    done
 
