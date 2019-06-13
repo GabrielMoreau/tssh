@@ -118,7 +118,7 @@ fi
 
 # get options
 if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:c:fvh" options
+while getopts "w:o:c:fvh" options
 do
    case ${options} in
       w)
