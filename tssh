@@ -17,10 +17,11 @@ NAME
    $(basename $0) - tmux cluster ssh
 
 SYNOPSIS
-   $0 [-w number] [-f] [-v] [-c remote_cmd] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+   $0 [-w number] [-f] [-v] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 OPTIONS
    -w             windows to open (integer, default 16)
+   -o             option to pass to ssh
    -f             fast, no nmap scan to eliminate sleeping computer
    -v             verbose
    -c remote_cmd  launch the remote command on hosts and exit
@@ -96,12 +97,13 @@ AUTHOR
    Gabriel Moreau
 
 COPYRIGHT
-   Copyright (C) 2014-2018, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
+   Copyright (C) 2014-2019, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
    Licence : GNU GPL version 2 or later
 END_USAGE
    }
 
 export remote_command=''
+export ssh_option=''
 export split_number=16
 if which tput > /dev/null
 then
@@ -132,6 +134,15 @@ do
          if echo ${OPTARG} | egrep -q '[[:alpha:]]'
          then
             export remote_command=${OPTARG}
+         else
+            usage
+            exit 2
+         fi
+         ;;
+      o)
+         if echo ${OPTARG} | egrep -q '[[:alpha:][:digit:]]'
+         then
+            export ssh_option=${OPTARG}
          else
             usage
             exit 2
@@ -261,14 +272,14 @@ do
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
-   tmux -2 new-session -d -s $session "ssh ${host[0]} ${remote_command}; sleep ${first_tempo}"
+   tmux -2 new-session -d -s $session "ssh ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_tempo}"
    # wait ${tempo} second to let new session start...
    sleep ${tempo}
 
    for (( i=1 ; i < ${#host[@]} ; i++))
    do
       # wait ${tempo} needed in case of ${remote_command}
-      tmux splitw -t $session "ssh ${host[$i]} ${remote_command}; sleep ${other_tempo}"
+      tmux splitw -t $session "ssh ${ssh_option}${host[$i]} ${remote_command}; sleep ${other_tempo}"
       tmux select-layout tiled
    done
 
