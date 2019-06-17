@@ -21,7 +21,7 @@ SYNOPSIS
 
 OPTIONS
    -w             windows to open (integer, default 16)
-   -o             option to pass to ssh
+   -o ssh_option  option to pass to ssh
    -f             fast, no nmap scan to eliminate sleeping computer
    -v             verbose
    -c remote_cmd  launch the remote command on hosts and exit
@@ -90,6 +90,7 @@ CONFIGURATION
    
     #export split_number=16
     export dyn_domain='mycompagny.local'
+    #export ssh_option=''
     #export fast='yes'
     #export verbose='yes'
 
@@ -279,7 +280,7 @@ do
    for (( i=1 ; i < ${#host[@]} ; i++))
    do
       # wait ${tempo} needed in case of ${remote_command}
-      tmux splitw -t $session "ssh ${ssh_option}${host[$i]} ${remote_command}; sleep ${other_tempo}"
+      tmux splitw -t $session "ssh ${ssh_option} ${host[$i]} ${remote_command}; sleep ${other_tempo}"
       tmux select-layout tiled
    done
 
