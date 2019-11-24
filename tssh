@@ -251,11 +251,11 @@ done
 
 if [ "${parallel}" == 'yes' -a -n "${remote_command}" ]
 then
-   if which parallel > /dev/null
+   if parallel --version 2> /dev/null | grep -q ^'GNU parallel'
    then
-      sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} "ssh ${ssh_option} {} ${remote_command}"
+      sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} -I {} -- "ssh ${ssh_option} {} ${remote_command}"
    else
-      sort -u "/tmp/${base_path}/master++" | xargs -n 1 -P ${split_number} -I{} ssh ${ssh_option} {} "${remote_command}"
+      sort -u "/tmp/${base_path}/master++" | xargs -r -n 1 -P ${split_number} -I {} -- ssh ${ssh_option} {} "${remote_command}"
    fi
 
    # Clean temporary folder
