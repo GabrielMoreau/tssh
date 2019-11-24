@@ -20,11 +20,12 @@ SYNOPSIS
    $0 [-w number] [-f] [-v] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 OPTIONS
-   -w             windows to open (integer, default 16)
+   -w windows     windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
    -f             fast, no nmap scan to eliminate sleeping computer
    -v             verbose
    -c remote_cmd  launch the remote command on hosts and exit
+   -p             launch in parallel (only with -c) with command parallel or xargs
    -h             help
 
 DESCRIPTION
@@ -119,7 +120,7 @@ fi
 
 # get options
 if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:o:c:fvh" options
+while getopts "w:o:c:fvph" options
 do
    case ${options} in
       w)
@@ -138,7 +139,10 @@ do
          else
             usage
             exit 2
-         fi
+         fi         
+         ;;
+      p)
+         export parallel='yes'
          ;;
       o)
          if echo ${OPTARG} | egrep -q '[[:alpha:][:digit:]]'
@@ -244,6 +248,22 @@ do
    egrep "^${f}$" "/tmp/${base_path}/master--" && continue
    echo "${f}" >> "/tmp/${base_path}/master++"
 done
+
+if [ "${parallel}" == 'yes' -a -n "${remote_command}" ]
+then
+   if which parallel > /dev/null
+   then
+      sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} "ssh ${ssh_option} {} ${remote_command}"
+   else
+      sort -u "/tmp/${base_path}/master++" | xargs -n 1 -P ${split_number} -I{} ssh ${ssh_option} {} "${remote_command}"
+   fi
+
+   # Clean temporary folder
+   [ -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"
+   
+   exit 0
+fi
+
 
 # split master list in paquet of split_number computer
 sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
