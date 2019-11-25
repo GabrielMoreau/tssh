@@ -10,13 +10,13 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.2.1'
+VERSION='0.2.2'
 
 function usage() {
    cat <<END_USAGE
 tssh - tmux cluster ssh
 
- tssh [-w number] [-f] [-v] [-p] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-v] [-h] [-p] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
    -w windows     windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
@@ -30,6 +30,7 @@ VERSION ${VERSION}
 END_USAGE
    }
 
+export delay_time=0.8
 export remote_command=''
 export ssh_option=''
 export split_number=16
@@ -198,14 +199,13 @@ fi
 sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
 
 # wait is needed by time tmux session open and ssh time connection
-tempo=0.8
-first_tempo=0
-other_tempo=0
+first_delay_time=0
+other_delay_time=0
 if [ -n "${remote_command}" ]
 then
-   # add tempo after remote command
-   other_tempo=${tempo}
-   first_tempo="${tempo} ${other_tempo}"
+   # add delay time after remote command
+   other_delay_time=${delay_time}
+   first_delay_time="${delay_time} ${other_delay_time}"
 fi
 
 # loop on each split windows
@@ -222,14 +222,14 @@ do
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
-   tmux -2 new-session -d -s $session "ssh ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_tempo}"
-   # wait ${tempo} second to let new session start...
-   sleep ${tempo}
+   tmux -2 new-session -d -s $session "ssh ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
+   # wait ${delay_time} second to let new session start...
+   sleep ${delay_time}
 
    for (( i=1 ; i < ${#host[@]} ; i++))
    do
-      # wait ${tempo} needed in case of ${remote_command}
-      tmux splitw -t $session "ssh ${ssh_option} ${host[$i]} ${remote_command}; sleep ${other_tempo}"
+      # wait ${delay_time} needed in case of ${remote_command}
+      tmux splitw -t $session "ssh ${ssh_option} ${host[$i]} ${remote_command}; sleep ${other_delay_time}"
       tmux select-layout tiled
    done
 
@@ -284,7 +284,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [-w number] [-f] [-v] [-p] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-v] [-h] [-p] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 OPTIONS
 
@@ -370,19 +370,27 @@ Values could be computer list or other key...
 
 The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the default parameters.
 
+ #export delay_time=0.8
  #export split_number=16
  export dyn_domain='mycompagny.local'
  #export ssh_option=''
  #export fast='yes'
  #export verbose='yes'
 
+=head2 C<delay_time>
+
+When use with C<tmux>, add a small delay before lauching the second shell to let C<tmux> open the window.
+
+
 =head1 SEE ALSO
 
 cluster-ssh, cssh, xargs, parallel, tmux
 
+
 =head1 AUTHORS
 
 Written by Gabriel Moreau, Grenoble - France
+
 
 =head1 COPYRIGHT
 
