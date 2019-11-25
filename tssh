@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.2.3'
+VERSION='0.2.4'
 
 function usage() {
    cat <<END_USAGE
@@ -288,23 +288,35 @@ tssh - tmux cluster ssh
 
 =head1 OPTIONS
 
-=over
+=head2 C<-w number> 
 
-=item C<-w number>      windows to open (integer, default 16)
+Windows to open (integer, default 16)
 
-=item C<-o ssh_option>  option to pass to ssh
+=head2 C<-o ssh_option>
 
-=item C<-f>             fast, no nmap scan to eliminate sleeping computer
+Option to pass to ssh
 
-=item C<-v>             verbose
+=head2 C<-f>
 
-=item C<-c remote_cmd>  launch the remote command on hosts and exit
+Fast, no nmap scan to eliminate sleeping computer
 
-=item C<-p>             launch in parallel (only with option C<-c>) with command parallel or xargs
+=head2 C<-c remote_cmd>
 
-=item C<-h>             help
+Launch the remote command on hosts and exit
 
-=back
+=head2 C<-p>
+
+Launch in parallel (only with option C<-c>) with command parallel or xargs
+
+=head2 C<-v>
+
+Verbose
+
+=head2 C<-h>
+
+Minimal help
+
+
 
 =head1 DESCRIPTION
 
@@ -379,7 +391,31 @@ The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the defa
 
 =head2 C<delay_time>
 
-When use with C<tmux>, add a small delay before lauching the second shell to let C<tmux> open the window.
+When use with C<tmux>,
+add a small delay before lauching the second shell to let C<tmux> open the window (default 0.8)
+
+=head2 C<split_number>
+
+See option C<-w>.
+
+=head2 C<dyn_domain>
+
+If computer doesn't respond on it's normal IP,
+search also to connect on it with this DNS domain.
+Could be use with DNS dynamic domain where computer register inside automatically.
+
+=head2 C<ssh_option>
+
+See option C<-o>.
+
+=head2 C<fast>
+
+See option C<-f>.
+
+=head2 C<verbose>
+
+See option C<-v>.
+
 
 
 =head1 SEE ALSO
