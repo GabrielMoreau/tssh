@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.2.0'
+VERSION='0.2.1'
 
 function usage() {
    cat <<END_USAGE
@@ -368,7 +368,7 @@ Values could be computer list or other key...
  team = pc01 pc06 laptop04 laptop05 laptop09
  switch = root@switch01 root@switch05 root@switch17
 
-The C<tssh> config file (F<~/.tsshrc>) can be use change the default parameters.
+The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the default parameters.
 
  #export split_number=16
  export dyn_domain='mycompagny.local'
