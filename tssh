@@ -5,23 +5,24 @@
 # From http://hd-recording.at/dokuwiki/doku.php?id=linux:tmux#tssh
 
 # Clean when Ctrl^C
-trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"; exit 4;' QUIT INT TERM
+trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"; exit 2;' QUIT INT TERM
 
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.2.4'
+VERSION='0.3.1'
 
 function usage() {
    cat <<END_USAGE
 tssh - tmux cluster ssh
 
- tssh [-w number] [-f] [-v] [-h] [-p] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-v] [-h] [-p] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
    -w windows     windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
    -f             fast, no nmap scan to eliminate sleeping computer
    -v             verbose
+   -d delay_time  delay between parallel connexion to remote host
    -c remote_cmd  launch the remote command on hosts and exit
    -p             launch in parallel (only with -c) with command parallel or xargs
    -h             help
@@ -50,7 +51,7 @@ fi
 
 # get options
 if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:o:c:fvph" options
+while getopts "w:o:d:c:fvph" options
 do
    case ${options} in
       w)
@@ -59,8 +60,17 @@ do
             export split_number=${OPTARG}
          else
             usage
-            exit 2
+            exit 4
          fi
+         ;;
+      d)
+         if echo ${OPTARG} | egrep -q '^[[:digit:]]+$' && [ ${OPTARG} -gt 0 ]
+         then
+            export delay_time=${OPTARG}
+         else
+            usage
+            exit 5
+         fi         
          ;;
       c)
          if echo ${OPTARG} | egrep -q '[[:alpha:]]'
@@ -68,7 +78,7 @@ do
             export remote_command=${OPTARG}
          else
             usage
-            exit 2
+            exit 6
          fi         
          ;;
       p)
@@ -80,7 +90,7 @@ do
             export ssh_option=${OPTARG}
          else
             usage
-            exit 2
+            exit 7
          fi
          ;;
       f)
@@ -284,7 +294,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [-w number] [-f] [-v] [-h] [-p] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-v] [-h] [-p] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 OPTIONS
 
@@ -299,6 +309,12 @@ Option to pass to ssh
 =head2 C<-f>
 
 Fast, no nmap scan to eliminate sleeping computer
+
+=head2 C<-d delay_time>
+
+When use C<tmux> context,
+add a small delay in second before lauching the second shell
+to let C<tmux> the time to open the window (default 0.8).
 
 =head2 C<-c remote_cmd>
 
@@ -391,8 +407,7 @@ The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the defa
 
 =head2 C<delay_time>
 
-When use with C<tmux>,
-add a small delay before lauching the second shell to let C<tmux> open the window (default 0.8)
+See option C<-d>.
 
 =head2 C<split_number>
 
