@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.2.2'
+VERSION='0.2.3'
 
 function usage() {
    cat <<END_USAGE
@@ -385,6 +385,18 @@ When use with C<tmux>, add a small delay before lauching the second shell to let
 =head1 SEE ALSO
 
 cluster-ssh, cssh, xargs, parallel, tmux
+
+Own project ressources:
+
+=over
+
+=item * L<Web site|http://servforge.legi.grenoble-inp.fr/projects/soft-trokata/wiki/SoftWare/Tssh>
+
+=item * L<Online Manual|http://servforge.legi.grenoble-inp.fr/pub/soft-trokata/tssh/tssh.html>
+
+=item * L<SVN repository|http://servforge.legi.grenoble-inp.fr/svn/soft-trokata/trunk/tssh>
+
+=back
 
 
 =head1 AUTHORS
