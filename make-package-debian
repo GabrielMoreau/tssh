@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# 2019/11/25 Gabriel Moreau <Gabriel.Moreau@univ-grenoble-alpes.fr>
+
+trap '[ -n "${tmp_folder}" -a -d "${tmp_folder}" ] && rm -rf "${tmp_folder}"' QUIT
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+export LANG=C
+
+tmp_folder=$(mktemp --directory /tmp/tssh-XXXXXX)
+[ -n "${tmp_folder}" -a -d "${tmp_folder}" ] || exit 1
+
+# Set Name and Version
+PKG_NAME=tssh
+CODE_VERSION=$(grep '^VERSION=' tssh | cut -f 2 -d "'") # '
+PKG_VERSION=1
+
+# Create future tree
+mkdir -p ${tmp_folder}/usr/bin
+mkdir -p ${tmp_folder}/usr/share/man/man1
+mkdir -p ${tmp_folder}/usr/share/tssh
+mkdir -p ${tmp_folder}/etc/bash_completion.d
+cp tssh                 ${tmp_folder}/usr/bin/
+cp tssh.1.gz            ${tmp_folder}/usr/share/man/man1/
+cp LICENSE.txt          ${tmp_folder}/usr/share/tssh/
+cp config.sample.sh     ${tmp_folder}/usr/share/tssh/
+cp tssh.bash_completion ${tmp_folder}/etc/bash_completion.d/
+chmod -R a+rx        ${tmp_folder}/usr/bin/tssh
+chmod -R a+rX,go-w   ${tmp_folder}/usr
+chmod -R a+rX,go-w   ${tmp_folder}/etc
+
+# Data archive
+rm -f ${tmp_folder}/data.tar.gz
+(cd ${tmp_folder}; tar --owner root --group root -czf data.tar.gz ./usr ./etc)
+
+# Control file
+cat <<END > ${tmp_folder}/control
+Package: ${PKG_NAME}
+Version: ${CODE_VERSION}-${PKG_VERSION}
+Section: utils
+Tag: implemented-in::bash, interface::commandline, role::program
+Priority: optional
+Depends: tmux, openssh-client, ncurses-bin, findutils, grep
+Suggests: nmap, parallel
+Architecture: all
+Installed-Size: $(du -ks ${tmp_folder}|cut -f 1)
+Maintainer: Gabriel Moreau <Gabriel.Moreau@univ-grenoble-alpes.fr>
+Description: tmux cluster ssh
+ tssh is an acronym for tmux ssh.
+ In practise, tssh is an ncurve version of cluster-ssh.
+ It has been used in the LEGI laboratory for over 5 years.
+ tssh is a small tool to luanch command over many computers.
+ .
+ The tool is quite effective and tries to keep things simple.
+Homepage: http://servforge.legi.grenoble-inp.fr/projects/soft-trokata/wiki/SoftWare/tssh
+END
+
+# Control archive
+rm -f ${tmp_folder}/control.tar.gz
+(cd ${tmp_folder}; tar --owner root --group root -czf control.tar.gz control)
+
+# Format deb package
+echo 2.0 > ${tmp_folder}/debian-binary
+
+# Create package (control before data)
+ar -r ${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb ${tmp_folder}/debian-binary ${tmp_folder}/control.tar.gz ${tmp_folder}/data.tar.gz
+      
+# Clean
+rm -rf ${tmp_folder}
+
+# Prepare reprepro upload
+echo "# Prepare reprepro upload"
+echo "( cd /srv/www/debian/ ; reprepro includedeb wheezy   ~/wheezy/${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb )"
+echo "( cd /srv/www/debian/ ; reprepro includedeb jessie   ~/jessie/${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb )"
+echo "( cd /srv/www/debian/ ; reprepro includedeb stretch ~/stretch/${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb )"
+echo "( cd /srv/www/debian/ ; reprepro dumpreferences ) | grep -i tssh"

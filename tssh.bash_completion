@@ -1,0 +1,19 @@
+# bash completion for tssh
+
+have tssh &&
+_tssh() {
+   local cur prev
+
+   COMPREPLY=()
+   #_get_comp_words_by_ref cur prev
+   cur="${COMP_WORDS[COMP_CWORD]}"
+   prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+   if [[ "$cur" == '-*' || $COMP_CWORD -gt 1 ]]
+   then
+      COMPREPLY=($(compgen -W "$(tssh -h|grep '^ tssh'|sed -e 's/[\[]/\n/g;'|grep -- '^-'|cut -f 1 -d ']'|cut -f 1 -d ' '|sed -e 's/|/ /g;'|xargs echo -n)" -- "$cur"))
+   else
+      COMPREPLY=($(compgen -W "$(tssh -h|grep '^ tssh'|sed -e 's/[\[]/\n/g;'|grep -- '^-'|cut -f 1 -d ']'|cut -f 1 -d ' '|sed -e 's/|/ /g;'|xargs echo -n)" -- "$cur"))
+   fi
+
+   } && complete -F _tssh tssh
