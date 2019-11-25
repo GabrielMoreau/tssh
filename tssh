@@ -10,16 +10,14 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
+VERSION='0.2.0'
 
 function usage() {
    cat <<END_USAGE
-NAME
-   $(basename $0) - tmux cluster ssh
+tssh - tmux cluster ssh
 
-SYNOPSIS
-   $0 [-w number] [-f] [-v] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-v] [-p] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
-OPTIONS
    -w windows     windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
    -f             fast, no nmap scan to eliminate sleeping computer
@@ -28,79 +26,7 @@ OPTIONS
    -p             launch in parallel (only with -c) with command parallel or xargs
    -h             help
 
-DESCRIPTION
-   tssh can be use to launch terminal on many computer in parallel with tmux
-   multiplexer and ssh.
-   The tmux windows is splitted automatically.
-   If you need more computers on the same windows, you can zoom in and out
-   under gnome terminal with Ctrl- or Ctrl+.
-   This must be done before launching tssh.
-   
-   On the command line, you can put host, login@host, clusterssh class.
-   A host or a class can be remove from the list with a dash append
-   and force to be in this one with a plus append.
-   Example with the cluster ssh config below:
-   
-    tssh all team- node005 laptop04+
-
-   Is equivalent to:
- 
-    tssh srv-mail srv-dns srv-imap srv-web srv-proxy \\
-      node001 node002 node003 node004 \\
-      node101 node102 node103 node104 \\
-      node005 laptop04
-
-   The control command for tmux is Ctrl^b.
-   You can switch from broadcast to a local machine with Ctrl^b Ctrl^b
-   and move between machine with Ctrl^b ArrowKey.
-
-DEPENDS
-   On Debian, you need the package
-
-    apt-get install tmux ncurses-bin wamerican nmap
-
-   wamerican (or wfrench...) is used to choose a random word in the file /usr/share/dict/words
-   for each new tmux session.
-
-   ncurses-bin is required for the tput command
-   to automatically split your terminal into several small panels.
-   nmap is only used for dynamic DNS domain and dynamic scan.
-   This is not mandatory for general use.
-
-   By default, tssh use tput to know the number of columns and lines of your terminal.
-   It takes 10 lines and 40 columns for each windows by default.
-   If tput is not installed, the default is 16 windows...
-
-CONFIGURATION
-   The clusterssh config file ~/.csshrc is a key values file.
-   The "clusters" is mandatory for clusterssh (not tssh) and define the other keys.
-   Values could be computer list or other key...
-   
-    clusters = all server s1 s2 s3 node n1 n2 team switch
-    all = server node team
-    server = s1 s2
-    node = n1 n2
-    s1 = srv-mail srv-dns srv-imap
-    s2 = srv-web srv-proxy
-    n1 = node001 node002 node003 node004
-    n2 = node101 node102 node103 node104
-    team = pc01 pc06 laptop04 laptop05 laptop09
-    switch = root@switch01 root@switch05 root@switch17
-
-   The tssh config file (~/.tsshrc) can be use change the default parameters.
-   
-    #export split_number=16
-    export dyn_domain='mycompagny.local'
-    #export ssh_option=''
-    #export fast='yes'
-    #export verbose='yes'
-
-AUTHOR
-   Gabriel Moreau
-
-COPYRIGHT
-   Copyright (C) 2014-2019, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
-   Licence : GNU GPL version 2 or later
+VERSION ${VERSION}
 END_USAGE
    }
 
@@ -113,7 +39,10 @@ then
 fi
 
 export dyn_domain=''
-if [ -e "${HOME}/.tsshrc" ]
+if [ -e "${HOME}/.config/tssh/config.sh" ]
+then
+   . "${HOME}/.config/tssh/config.sh"
+elif [ -e "${HOME}/.tsshrc" ]
 then
    . "${HOME}/.tsshrc"
 fi
@@ -373,7 +302,7 @@ tssh - tmux cluster ssh
 
 =item C<-p>             launch in parallel (only with option C<-c>) with command parallel or xargs
 
-=item  C<-h>             help
+=item C<-h>             help
 
 =back
 
