@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.1'
+VERSION='0.3.2'
 
 function usage() {
    cat <<END_USAGE
@@ -296,6 +296,26 @@ tssh - tmux cluster ssh
 
  tssh [-w number] [-f] [-v] [-h] [-p] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
+=head1 DESCRIPTION
+
+tssh can be use to launch terminal on many computer in parallel with tmux
+multiplexer and ssh.
+The tmux windows is splitted automatically.
+If you need more computers on the same windows, you can zoom in and out
+under gnome terminal with Ctrl- or Ctrl+.
+This must be done before launching tssh.
+
+On the command line, you can put C<host>, C<login@host>, C<clusterssh class>.
+A host or a class can be remove from the list with a dash append
+and force to be in this one with a plus append.
+
+See some L<Example> below.
+
+The control command for C<tmux> is C<Ctrl^b>.
+You can switch from broadcast to a local machine with C<Ctrl^b Ctrl^b>
+and move between machine with C<Ctrl^b ArrowKey>.
+
+
 =head1 OPTIONS
 
 =head2 C<-w number> 
@@ -332,52 +352,6 @@ Verbose
 
 Minimal help
 
-
-
-=head1 DESCRIPTION
-
-tssh can be use to launch terminal on many computer in parallel with tmux
-multiplexer and ssh.
-The tmux windows is splitted automatically.
-If you need more computers on the same windows, you can zoom in and out
-under gnome terminal with Ctrl- or Ctrl+.
-This must be done before launching tssh.
-
-On the command line, you can put C<host>, C<login@host>, C<clusterssh class>.
-A host or a class can be remove from the list with a dash append
-and force to be in this one with a plus append.
-Example with the cluster ssh config below:
-
- tssh all team- node005 laptop04+
-
-Is equivalent to:
-
- tssh srv-mail srv-dns srv-imap srv-web srv-proxy \\
-   node001 node002 node003 node004 \\
-   node101 node102 node103 node104 \\
-   node005 laptop04
-
-The control command for C<tmux> is C<Ctrl^b>.
-You can switch from broadcast to a local machine with C<Ctrl^b Ctrl^b>
-and move between machine with C<Ctrl^b ArrowKey>.
-
-=head1 DEPENDS
-
-On Debian, you need the package
-
- apt-get install tmux ncurses-bin wamerican nmap
-
-C<wamerican> (or C<wfrench>...) is used to choose a random word in the file F</usr/share/dict/words>
-for each new tmux session.
-
-C<ncurses-bin> is required for the C<tput> command
-to automatically split your terminal into several small panels.
-C<nmap> is only used for dynamic DNS domain and dynamic scan.
-This is not mandatory for general use.
-
-By default, C<tssh> use C<tput> to know the number of columns and lines of your terminal.
-It takes 10 lines and 40 columns for each windows by default.
-If C<tput> is not installed, the default is 16 windows...
 
 =head1 CONFIGURATION
 
@@ -432,6 +406,54 @@ See option C<-f>.
 See option C<-v>.
 
 
+=head1 EXAMPLES
+
+=over
+
+=item * Example with the cluster ssh config above:
+
+ tssh all team- node005 laptop04+
+
+Is equivalent to:
+
+ tssh srv-mail srv-dns srv-imap srv-web srv-proxy \\
+   node001 node002 node003 node004 \\
+   node101 node102 node103 node104 \\
+   node005 laptop04
+
+=item * Batch mode with C<tmux>
+
+ tssh -c 'sudo apt-get update' all team
+
+=item * Batch mode with C<parallel> or C<xargs> (without C<tmux>)
+
+ tssh -c 'sudo apt-get update' -p all team
+
+=item * Connexion without the ssh key
+
+ tssh -o '-F /dev/null' all team
+
+=back
+
+
+=head1 DEPENDS
+
+On Debian, you need the package
+
+ apt-get install tmux ncurses-bin wamerican nmap
+
+C<wamerican> (or C<wfrench>...) is used to choose a random word in the file F</usr/share/dict/words>
+for each new tmux session.
+
+C<ncurses-bin> is required for the C<tput> command
+to automatically split your terminal into several small panels.
+C<nmap> is only used for dynamic DNS domain and dynamic scan.
+This is not mandatory for general use.
+
+By default, C<tssh> use C<tput> to know the number of columns and lines of your terminal.
+It takes 10 lines and 40 columns for each windows by default.
+If C<tput> is not installed, the default is 16 windows...
+
 
 =head1 SEE ALSO
 
@@ -446,6 +468,8 @@ Own project ressources:
 =item * L<Online Manual|http://servforge.legi.grenoble-inp.fr/pub/soft-trokata/tssh/tssh.html>
 
 =item * L<SVN repository|http://servforge.legi.grenoble-inp.fr/svn/soft-trokata/trunk/tssh>
+
+=item * L<Download package (Debian)|http://servforge.legi.grenoble-inp.fr/pub/soft-trokata/tssh/download/>
 
 =back
 

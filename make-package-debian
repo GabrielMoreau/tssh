@@ -37,19 +37,22 @@ rm -f ${tmp_folder}/data.tar.gz
 cat <<END > ${tmp_folder}/control
 Package: ${PKG_NAME}
 Version: ${CODE_VERSION}-${PKG_VERSION}
-Section: utils
-Tag: implemented-in::bash, interface::commandline, role::program
+Section: admin
+Tag: admin::cluster, implemented-in::bash, interface::commandline, interface::text-mode, network::client, protocol::ssh, role::program, use::login
 Priority: optional
-Depends: tmux, openssh-client, ncurses-bin, findutils, grep
+Depends: tmux, openssh-client, ncurses-bin, findutils, grep, wamerican | wfrench
 Suggests: nmap, parallel
 Architecture: all
 Installed-Size: $(du -ks ${tmp_folder}|cut -f 1)
 Maintainer: Gabriel Moreau <Gabriel.Moreau@univ-grenoble-alpes.fr>
-Description: tmux cluster ssh
+Description: administer multiple ssh shells simultaneously with tmux
  tssh is an acronym for tmux ssh.
  In practise, tssh is an ncurve version of cluster-ssh.
  It has been used in the LEGI laboratory for over 5 years.
- tssh is a small tool to luanch command over many computers.
+ tssh is a small tool to launch command over many computers.
+ It allows you to control multiple ssh sessions from a single input window.
+ You can also configure clusters of machines for easy invocation
+ and interact with individual terminal windows during a session.
  .
  The tool is quite effective and tries to keep things simple.
 Homepage: http://servforge.legi.grenoble-inp.fr/projects/soft-trokata/wiki/SoftWare/tssh
@@ -73,4 +76,5 @@ echo "# Prepare reprepro upload"
 echo "( cd /srv/www/debian/ ; reprepro includedeb wheezy   ~/wheezy/${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb )"
 echo "( cd /srv/www/debian/ ; reprepro includedeb jessie   ~/jessie/${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb )"
 echo "( cd /srv/www/debian/ ; reprepro includedeb stretch ~/stretch/${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb )"
+echo "( cd /srv/www/debian/ ; reprepro includedeb buster   ~/buster/${PKG_NAME}_${CODE_VERSION}-${PKG_VERSION}_all.deb )"
 echo "( cd /srv/www/debian/ ; reprepro dumpreferences ) | grep -i tssh"
