@@ -40,11 +40,12 @@ Les sources sont gérés via Git (GitLab).
 Il est très facile de rester synchronisé par rapport à ces sources.
 
  * la récupération initiale
-   ```bash
-git clone https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
+
+```bash
+svn clone ttps://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 ```
  * les mises à jour par la suite
-   ```bash
+```bash
 git pull
 ```
 
