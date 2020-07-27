@@ -41,7 +41,7 @@ Il est très facile de rester synchronisé par rapport à ces sources.
 
  * la récupération initiale
    ```bash
-svn clone ttps://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
+git clone https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 ```
  * les mises à jour par la suite
    ```bash
@@ -61,7 +61,7 @@ et nous donne la recette, nous l’appliquerons.
 ### Patch
 
 Il est possible d'avoir un accès en écriture à la forge
-sur demande motivée à [mailto:Gabriel.Moreau(A)legi.grenoble-inp.fr Gabriel Moreau].
+sur demande motivée à [Gabriel Moreau](mailto:Gabriel.Moreau A_ legi.grenoble-inp.fr).
 Pour des questions de temps d'administration et de sécurité,
 la forge n'est pas accessible en écriture sans autorisation.
 Pour des questions de décentralisation du web, d'autonomie
