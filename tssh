@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.2'
+VERSION='0.3.3'
 
 function usage() {
    cat <<END_USAGE
@@ -463,13 +463,11 @@ Own project ressources:
 
 =over
 
-=item * L<Web site|http://servforge.legi.grenoble-inp.fr/projects/soft-trokata/wiki/SoftWare/Tssh>
+=item * L<Web site|https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh>
 
-=item * L<Online Manual|http://servforge.legi.grenoble-inp.fr/pub/soft-trokata/tssh/tssh.html>
+=item * L<Online Manual|https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/>
 
-=item * L<SVN repository|http://servforge.legi.grenoble-inp.fr/svn/soft-trokata/trunk/tssh>
-
-=item * L<Download package (Debian)|http://servforge.legi.grenoble-inp.fr/pub/soft-trokata/tssh/download/>
+=item * L<Download package (Debian)|https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/download/>
 
 =back
 

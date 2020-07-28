@@ -55,7 +55,7 @@ Description: administer multiple ssh shells simultaneously with tmux
  and interact with individual terminal windows during a session.
  .
  The tool is quite effective and tries to keep things simple.
-Homepage: http://servforge.legi.grenoble-inp.fr/projects/soft-trokata/wiki/SoftWare/tssh
+Homepage: https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 END
 
 # Control archive
