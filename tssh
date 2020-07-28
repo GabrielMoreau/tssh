@@ -309,7 +309,7 @@ On the command line, you can put C<host>, C<login@host>, C<clusterssh class>.
 A host or a class can be remove from the list with a dash append
 and force to be in this one with a plus append.
 
-See some L<Example> below.
+See some L</EXAMPLES> below.
 
 The control command for C<tmux> is C<Ctrl^b>.
 You can switch from broadcast to a local machine with C<Ctrl^b Ctrl^b>
