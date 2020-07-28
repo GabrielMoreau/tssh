@@ -11,7 +11,7 @@ wget https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh/-/raw/m
 chmod u+x ./tssh
 ```
 
-L'utilisation de ```tssh``` est dans le manuel.
+L'utilisation de ```tssh``` est dans le [manuel](https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/).
 ```bash
 man tssh
 ```
@@ -42,7 +42,7 @@ Il est très facile de rester synchronisé par rapport à ces sources.
  * la récupération initiale
 
 ```bash
-svn clone ttps://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
+git clone ttps://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 ```
  * les mises à jour par la suite
 ```bash
@@ -51,9 +51,9 @@ git pull
 
 ### Téléchargement / Download
 
-Des paquets Debian à jour (TODO).
+Des paquets Debian à jour sur https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/download.
 
-À noter que les paquets Debian sont très simple et ne vérifie certainement pas toutes les règles de la charte Debian.
+À noter que les paquets Debian sont très simples et ne vérifient certainement pas toutes les règles de la charte Debian.
 Il sont cependant fonctionnels et en production au LEGI.
 
 Si une personne sait comment faire un ```rpm```
