@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.3'
+VERSION='0.3.4'
 
 function usage() {
    cat <<END_USAGE
@@ -26,6 +26,7 @@ tssh - tmux cluster ssh
    -c remote_cmd  launch the remote command on hosts and exit
    -p             launch in parallel (only with -c) with command parallel or xargs
    -h             help
+   -l log_file    verbose in log file
 
 VERSION ${VERSION}
 END_USAGE
@@ -51,7 +52,7 @@ fi
 
 # get options
 if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:o:d:c:fvph" options
+while getopts "w:o:d:c:fvlph" options
 do
    case ${options} in
       w)
@@ -98,6 +99,9 @@ do
          ;;
       v)
          export verbose='yes'
+         ;;
+      l)
+         export log_file=${OPTARG}
          ;;
       h|*)
          usage
@@ -150,6 +154,7 @@ get_host_list () {
             if host ${justhost} | grep -q 'not found'
             then
                [ "${verbose}" == 'yes' ] && echo "Warning: ${justhost} does not exists"
+               [ -n "${log_file}" ]      && echo "Warning: ${justhost} does not exists" >> "${log_file}"
                continue
             fi
             if ! nmap -p 22 -sT -PN ${justhost} | grep -q '\bopen\b'
@@ -157,19 +162,23 @@ get_host_list () {
                if host ${justhost}.${dyn_domain} | grep -q 'not found' || ! nmap -p 22 -sT -PN ${justhost}.${dyn_domain} | grep -q '\bopen\b'
                then
                   [ "${verbose}" == 'yes' ] && echo "Warning: ${justhost} is down"
+                  [ -n "${log_file}" ]      && echo "Warning: ${justhost} is down" >> "${log_file}"
                   continue
                else
                   [ "${verbose}" == 'yes' ] && echo "Warning: remove ssh key of ${justhost}.${dyn_domain}"
+                  [ -n "${log_file}" ]      && echo "Warning: remove ssh key of ${justhost}.${dyn_domain}" >> "${log_file}"
                   host=${justhost}.${dyn_domain}
                   ssh-keygen -q -R $(LANG=C host ${justhost} | awk '{print $4}')
                fi
             fi
          fi
          [ "${verbose}" == 'yes' ] && echo "Warning: add ${host} on list with mode ${mode}"
+         [ -n "${log_file}" ]      && echo "Warning: add ${host} on list with mode ${mode}" >> "${log_file}"
          echo "${host}" >> "/tmp/${base_path}/master${mode}"
       else
          # cluster, jump in a recursive mode
          [ "${verbose}" == 'yes' ] && echo "Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}"
+         [ -n "${log_file}" ]      && echo "Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}" >> "${log_file}"
          cluster=$(get_host_list --mode=${mode} "${cluster}")
       fi
    done
@@ -226,6 +235,11 @@ do
       echo "Info: next hosts to be splitted"
       cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;'
       sleep 5
+   fi
+   if [ -n "${log_file}" ]
+   then
+      echo "Info: next hosts to be splitted" >> "${log_file}"
+      cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;' >> "${log_file}"
    fi
 
    session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
@@ -294,7 +308,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [-w number] [-f] [-v] [-h] [-p] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-h] [-p] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 DESCRIPTION
 
@@ -347,6 +361,10 @@ Launch in parallel (only with option C<-c>) with command parallel or xargs
 =head2 C<-v>
 
 Verbose
+
+=head2 C<-l log_file>
+
+Like verbose but append message in the F<log_file>.
 
 =head2 C<-h>
 
@@ -479,5 +497,5 @@ Written by Gabriel Moreau, Grenoble - France
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2019, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
+Copyright (C) 2014-2020, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
 Licence : GNU GPL version 2 or later
