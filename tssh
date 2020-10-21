@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.6'
+VERSION='0.3.7'
 
 function usage() {
    cat <<END_USAGE
@@ -101,7 +101,12 @@ do
          export verbose='yes'
          ;;
       l)
-         export log_file="${PWD}/${OPTARG}"
+         if echo ${OPTARG} | egrep -q '^/'
+         then
+            export ssh_option=${OPTARG}
+         else
+            export log_file="${PWD}/${OPTARG}"
+         fi
          ;;
       h|*)
          usage
