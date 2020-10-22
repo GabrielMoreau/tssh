@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.7'
+VERSION='0.3.8'
 
 function usage() {
    cat <<END_USAGE
@@ -26,7 +26,7 @@ tssh - tmux cluster ssh
    -c remote_cmd  launch the remote command on hosts and exit
    -p             launch in parallel (only with -c) with command parallel or xargs
    -h             help
-   -l log_file    verbose in log file
+   -l log_file    verbose in log file and test ssh key
 
 VERSION ${VERSION}
 END_USAGE
@@ -103,7 +103,7 @@ do
       l)
          if echo ${OPTARG} | egrep -q '^/'
          then
-            export ssh_option=${OPTARG}
+            export log_file=${OPTARG}
          else
             export log_file="${PWD}/${OPTARG}"
          fi
@@ -251,11 +251,20 @@ do
 
    IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
 
+   if [ -n "${log_file}" ]
+   then
+      for ((i=0 ; i < ${#host[@]} ; i++))
+      do
+         echo "HOST: ${host[$i]}" >> "${log_file}"
+         ssh -o 'PasswordAuthentication no' -F /dev/null ${host[$i]} 2>&1 | grep -v '^Permission denied (publickey,password).' >> "${log_file}"
+      done
+   fi
+
    tmux -2 new-session -d -s $session "ssh ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
    # wait ${delay_time} second to let new session start...
    sleep ${delay_time}
 
-   for (( i=1 ; i < ${#host[@]} ; i++))
+   for ((i=1 ; i < ${#host[@]} ; i++))
    do
       # wait ${delay_time} needed in case of ${remote_command}
       tmux splitw -t $session "ssh ${ssh_option} ${host[$i]} ${remote_command}; sleep ${other_delay_time}"
