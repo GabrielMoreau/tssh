@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.10'
+VERSION='0.3.11'
 
 function usage() {
    cat <<END_USAGE
@@ -514,5 +514,5 @@ Written by Gabriel Moreau, Grenoble - France
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
+Copyright (C) 2014-2021, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
 Licence : GNU GPL version 2 or later
