@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.12'
+VERSION='0.3.13'
 
 function usage() {
    cat <<END_USAGE
@@ -54,7 +54,7 @@ fi
 
 # get options
 if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:o:d:c:fvl:ph" options
+while getopts "w:o:d:c:fvl:pih" options
 do
    case ${options} in
       w)
