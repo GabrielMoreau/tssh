@@ -10,13 +10,13 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.11'
+VERSION='0.3.12'
 
 function usage() {
    cat <<END_USAGE
 tssh - tmux cluster ssh
 
- tssh [-w number] [-f] [-h] [-p] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-h] [-p] [-i] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
    -w windows     windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
@@ -25,6 +25,7 @@ tssh - tmux cluster ssh
    -d delay_time  delay between parallel connexion to remote host
    -c remote_cmd  launch the remote command on hosts and exit
    -p             launch in parallel (only with -c) with command parallel or xargs
+   -i             just ping, no ssh
    -h             help
    -l log_file    verbose in log file and test ssh key
 
@@ -35,6 +36,7 @@ END_USAGE
 export delay_time=0.8
 export remote_command=''
 export ssh_option=''
+export ssh_cmd=ssh
 export split_number=16
 if which tput > /dev/null
 then
@@ -84,6 +86,10 @@ do
          ;;
       p)
          export parallel='yes'
+         ;;
+      i)
+         export ssh_cmd=ping
+         export ssh_option=''
          ;;
       o)
          if echo ${OPTARG} | egrep -q '[[:alpha:][:digit:]]'
@@ -209,9 +215,9 @@ if [ "${parallel}" == 'yes' -a -n "${remote_command}" ]
 then
    if parallel --version 2> /dev/null | grep -q ^'GNU parallel'
    then
-      sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} -I {} -- "ssh ${ssh_option} {} ${remote_command}"
+      sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
    else
-      sort -u "/tmp/${base_path}/master++" | xargs -r -n 1 -P ${split_number} -I {} -- ssh ${ssh_option} {} "${remote_command}"
+      sort -u "/tmp/${base_path}/master++" | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
    fi
 
    # Clean temporary folder
@@ -262,14 +268,14 @@ do
       done
    fi
 
-   tmux -2 new-session -d -s $session "ssh ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
+   tmux -2 new-session -d -s $session "${ssh_cmd} ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
    # wait ${delay_time} second to let new session start...
    sleep ${delay_time}
 
    for ((i=1 ; i < ${#host[@]} ; i++))
    do
       # wait ${delay_time} needed in case of ${remote_command}
-      tmux splitw -t $session "ssh ${ssh_option} ${host[$i]} ${remote_command}; sleep ${other_delay_time}"
+      tmux splitw -t $session "${ssh_cmd} ${ssh_option} ${host[$i]} ${remote_command}; sleep ${other_delay_time}"
       tmux select-layout tiled
    done
 
@@ -325,7 +331,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [-w number] [-f] [-h] [-p] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-h] [-p] [-i] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 DESCRIPTION
 
@@ -374,6 +380,10 @@ Launch the remote command on hosts and exit
 =head2 C<-p>
 
 Launch in parallel (only with option C<-c>) with command parallel or xargs
+
+=head2 C<-i>
+
+No ssh, just ping host
 
 =head2 C<-v>
 
