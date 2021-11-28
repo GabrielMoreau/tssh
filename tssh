@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.13'
+VERSION='0.3.14'
 
 function usage() {
    cat <<END_USAGE
@@ -180,8 +180,8 @@ get_host_list () {
                else
                   [ "${verbose}" == 'yes' ] && echo "Warning: remove ssh key of ${justhost}.${dyn_domain}"
                   [ -n "${log_file}" ]      && echo "Warning: remove ssh key of ${justhost}.${dyn_domain}" >> "${log_file}"
-                  host=${justhost}.${dyn_domain}
-                  ssh-keygen -q -R $(LANG=C host ${justhost} | awk '{print $4}')
+                  host=${host}.${dyn_domain}
+                  ssh-keygen -q -R $(LANG=C host ${justhost}.${dyn_domain} | awk '{print $4}')
                fi
             fi
          fi
