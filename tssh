@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.15'
+VERSION='0.3.16'
 
 function usage() {
    cat <<END_USAGE
@@ -187,7 +187,7 @@ get_host_list () {
          fi
          [ "${verbose}" == 'yes' ] && echo "Warning: add ${host} on list with mode ${mode}"
          [ -n "${log_file}" ]      && echo "Warning: add ${host} on list with mode ${mode}" >> "${log_file}"
-         echo "${host}" >> "/tmp/${base_path}/master${mode}"
+         echo "${host}" | grep --line-buffered . >> "/tmp/${base_path}/master${mode}"
       else
          # cluster, jump in a recursive mode
          [ "${verbose}" == 'yes' ] && echo "Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}"
@@ -200,16 +200,16 @@ declare -fx get_host_list
 
 get_host_list $@
 sleep 1 # why ? why not !
-cat "/tmp/${base_path}/master+" >> "/tmp/${base_path}/master"
+cat "/tmp/${base_path}/master+" | grep --line-buffered . >> "/tmp/${base_path}/master"
 for f in $(grep . "/tmp/${base_path}/master-")
 do
    egrep "^${f}$" "/tmp/${base_path}/master+" && continue
-   echo "${f}" >> "/tmp/${base_path}/master--"
+   echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master--"
 done
 for f in $(grep . "/tmp/${base_path}/master")
 do
    egrep "^${f}$" "/tmp/${base_path}/master--" && continue
-   echo "${f}" >> "/tmp/${base_path}/master++"
+   echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master++"
 done
 
 if [ "${parallel}" == 'yes' -a -n "${remote_command}" ]
