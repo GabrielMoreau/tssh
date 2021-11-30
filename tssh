@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.14'
+VERSION='0.3.15'
 
 function usage() {
    cat <<END_USAGE
@@ -199,6 +199,7 @@ get_host_list () {
 declare -fx get_host_list
 
 get_host_list $@
+sleep 1 # why ? why not !
 cat "/tmp/${base_path}/master+" >> "/tmp/${base_path}/master"
 for f in $(grep . "/tmp/${base_path}/master-")
 do
