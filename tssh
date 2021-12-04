@@ -10,7 +10,7 @@ trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_pat
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.16'
+VERSION='0.3.17'
 
 function usage() {
    cat <<END_USAGE
@@ -127,18 +127,18 @@ shift $((OPTIND - 1))
 
 cd /tmp/
 export base_path=$(mktemp -d tssh.XXXXXX)
-touch "/tmp/${base_path}/master"
-touch "/tmp/${base_path}/master-"
-touch "/tmp/${base_path}/master+"
-touch "/tmp/${base_path}/master--"
-touch "/tmp/${base_path}/master++"
+#touch "/tmp/${base_path}/master"
+#touch "/tmp/${base_path}/master-"
+#touch "/tmp/${base_path}/master+"
+#touch "/tmp/${base_path}/master--"
+#touch "/tmp/${base_path}/master++"
+declare -A ghkey
 
 get_host_list () {
-   local cluster
    local default_mode=''
 
    # set local mode
-   if echo $1 | grep -- ^--mode=
+   if echo $1 | grep -q -- ^--mode=
    then
       default_mode=$(echo $1 | grep -- ^--mode= | cut -f 2 -d '=')
       shift
@@ -157,7 +157,7 @@ get_host_list () {
       # short host without login part if any
       local justhost=${host#*@}
       
-      cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=' | sed -e 's/^[[:space:]]*//;')
+      local cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=' | sed -e 's/^[[:space:]]*//;')
       if [ "${cluster}" == "" ]
       then
          # just a host to scan and add
@@ -187,38 +187,51 @@ get_host_list () {
          fi
          [ "${verbose}" == 'yes' ] && echo "Warning: add ${host} on list with mode ${mode}"
          [ -n "${log_file}" ]      && echo "Warning: add ${host} on list with mode ${mode}" >> "${log_file}"
-         echo "${host}" | grep --line-buffered . >> "/tmp/${base_path}/master${mode}"
+         #echo "${host}" | grep --line-buffered . >> "/tmp/${base_path}/master${mode}"
+         ghkey["master${mode}"]=${ghkey["master${mode}"]}" ${host} "
       else
          # cluster, jump in a recursive mode
          [ "${verbose}" == 'yes' ] && echo "Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}"
          [ -n "${log_file}" ]      && echo "Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}" >> "${log_file}"
-         cluster=$(get_host_list --mode=${mode} "${cluster}")
+         #cluster=$(get_host_list --mode=${mode} "${cluster}")
+         get_host_list --mode=${mode} "${cluster}"
       fi
    done
    }
 declare -fx get_host_list
 
 get_host_list $@
-sleep 1 # why ? why not !
-cat "/tmp/${base_path}/master+" | grep --line-buffered . >> "/tmp/${base_path}/master"
-for f in $(grep . "/tmp/${base_path}/master-")
+#sleep 1 # why ? why not !
+#cat "/tmp/${base_path}/master+" | grep --line-buffered . >> "/tmp/${base_path}/master"
+ghkey["master"]=${ghkey["master"]}${ghkey["master+"]}
+#for f in $(grep . "/tmp/${base_path}/master-")
+for f in ${ghkey["master-"]}
 do
-   egrep "^${f}$" "/tmp/${base_path}/master+" && continue
-   echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master--"
+   echo " "${ghkey["master+"]}" " | grep "[[:space:]]${f}[[:space:]]" && continue
+   ghkey["master--"]=${ghkey["master--"]}" ${f} "
+   #egrep "^${f}$" "/tmp/${base_path}/master+" && continue
+   #echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master--"
 done
-for f in $(grep . "/tmp/${base_path}/master")
+#for f in $(grep . "/tmp/${base_path}/master")
+for f in ${ghkey["master"]}
 do
-   egrep "^${f}$" "/tmp/${base_path}/master--" && continue
-   echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master++"
+   echo " "${ghkey["master--"]}" " | grep "[[:space:]]${f}[[:space:]]" && continue
+   ghkey["master++"]=${ghkey["master++"]}" ${f} "
+   #egrep "^${f}$" "/tmp/${base_path}/master--" && continue
+   #echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master++"
 done
+
+host_sort=$(echo ${ghkey["master++"]} | tr ' ' '\n' | sort -u)
 
 if [ "${parallel}" == 'yes' -a -n "${remote_command}" ]
 then
    if parallel --version 2> /dev/null | grep -q ^'GNU parallel'
    then
-      sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
+      echo ${host_sort} | tr ' ' '\n' | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
+      #sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
    else
-      sort -u "/tmp/${base_path}/master++" | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
+      echo ${host_sort} | tr ' ' '\n' | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
+      #sort -u "/tmp/${base_path}/master++" | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
    fi
 
    # Clean temporary folder
@@ -229,7 +242,8 @@ fi
 
 
 # split master list in paquet of split_number computer
-sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
+echo ${host_sort} | tr ' ' '\n' | split -l ${split_number} - /tmp/${base_path}/__splitted_
+#sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
 
 # wait is needed by time tmux session open and ssh time connection
 first_delay_time=0
@@ -246,13 +260,13 @@ for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
 do
    if [ "${verbose}" == 'yes' ]
    then
-      echo "Info: next hosts to be splitted"
+      echo "Info: next hosts to be splitted modulo ${split_number}"
       cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;'
       sleep 5
    fi
    if [ -n "${log_file}" ]
    then
-      echo "Info: next hosts to be splitted" >> "${log_file}"
+      echo "Info: next hosts to be splitted modulo ${split_number}" >> "${log_file}"
       cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;' >> "${log_file}"
    fi
 
@@ -272,6 +286,15 @@ do
    tmux -2 new-session -d -s $session "${ssh_cmd} ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
    # wait ${delay_time} second to let new session start...
    sleep ${delay_time}
+   while (true)
+   do
+      if tmux list-sessions -F "#{session_name}" | grep "^$session$"
+      then
+         break
+      fi
+      tmux -2 new-session -d -s $session "${ssh_cmd} ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
+      sleep ${delay_time}
+   done
 
    for ((i=1 ; i < ${#host[@]} ; i++))
    do
