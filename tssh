@@ -202,22 +202,20 @@ do
    ghkey["master++"]=${ghkey["master++"]}" ${f} "
 done
 
-host_sort=$(echo ${ghkey["master++"]} | tr ' ' '\n' | sort -u)
+# array
+array_host=($(echo ${ghkey["master++"]} | tr ' ' '\n' | sort -u))
 
 if [ "${parallel}" == 'yes' -a -n "${remote_command}" ]
 then
    if parallel --version 2> /dev/null | grep -q ^'GNU parallel'
    then
-      echo ${host_sort} | tr ' ' '\n' | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
+      printf "%s\n" "${array_host[@]}" | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
    else
-      echo ${host_sort} | tr ' ' '\n' | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
+      printf "%s\n" "${array_host[@]}" | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
    fi   
 
    exit 0
 fi
-
-# array
-array_host=($(echo ${host_sort} | tr ' ' '\n'))
 
 # wait is needed by time tmux session open and ssh time connection
 first_delay_time=0
