@@ -2,15 +2,12 @@
 #
 # 2014/03/26 Gabriel Moreau <Gabriel Moreau(A)univ-grenoble-alpes.fr> - Initial release
 #
-# From http://hd-recording.at/dokuwiki/doku.php?id=linux:tmux#tssh
-
-# Clean when Ctrl^C
-#trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"; exit 2;' QUIT INT TERM
+# Originally from http://hd-recording.at/dokuwiki/doku.php?id=linux:tmux#tssh
 
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.1'
+VERSION='0.4.2'
 
 function usage() {
    cat <<END_USAGE
@@ -125,13 +122,7 @@ shift $((OPTIND - 1))
 
 [ -n "${log_file}" ] && echo "Info: begin tssh" >> "${log_file}"
 
-cd /tmp/
-#export base_path=$(mktemp -d tssh.XXXXXX)
-#touch "/tmp/${base_path}/master"
-#touch "/tmp/${base_path}/master-"
-#touch "/tmp/${base_path}/master+"
-#touch "/tmp/${base_path}/master--"
-#touch "/tmp/${base_path}/master++"
+# hash table
 declare -A ghkey
 
 get_host_list () {
@@ -187,13 +178,11 @@ get_host_list () {
          fi
          [ "${verbose}" == 'yes' ] && echo "Warning: add ${host} on list with mode ${mode}"
          [ -n "${log_file}" ]      && echo "Warning: add ${host} on list with mode ${mode}" >> "${log_file}"
-         #echo "${host}" | grep --line-buffered . >> "/tmp/${base_path}/master${mode}"
          ghkey["master${mode}"]=${ghkey["master${mode}"]}" ${host} "
       else
          # cluster, jump in a recursive mode
          [ "${verbose}" == 'yes' ] && echo "Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}"
          [ -n "${log_file}" ]      && echo "Warning: recursive call for cluster ${justhost} (${cluster}), with mode ${mode}" >> "${log_file}"
-         #cluster=$(get_host_list --mode=${mode} "${cluster}")
          get_host_list --mode=${mode} "${cluster}"
       fi
    done
@@ -201,24 +190,16 @@ get_host_list () {
 declare -fx get_host_list
 
 get_host_list $@
-#sleep 1 # why ? why not !
-#cat "/tmp/${base_path}/master+" | grep --line-buffered . >> "/tmp/${base_path}/master"
 ghkey["master"]=${ghkey["master"]}${ghkey["master+"]}
-#for f in $(grep . "/tmp/${base_path}/master-")
 for f in ${ghkey["master-"]}
 do
    echo " "${ghkey["master+"]}" " | grep "[[:space:]]${f}[[:space:]]" && continue
    ghkey["master--"]=${ghkey["master--"]}" ${f} "
-   #egrep "^${f}$" "/tmp/${base_path}/master+" && continue
-   #echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master--"
 done
-#for f in $(grep . "/tmp/${base_path}/master")
 for f in ${ghkey["master"]}
 do
    echo " "${ghkey["master--"]}" " | grep "[[:space:]]${f}[[:space:]]" && continue
    ghkey["master++"]=${ghkey["master++"]}" ${f} "
-   #egrep "^${f}$" "/tmp/${base_path}/master--" && continue
-   #echo "${f}" | grep --line-buffered . >> "/tmp/${base_path}/master++"
 done
 
 host_sort=$(echo ${ghkey["master++"]} | tr ' ' '\n' | sort -u)
@@ -228,22 +209,14 @@ then
    if parallel --version 2> /dev/null | grep -q ^'GNU parallel'
    then
       echo ${host_sort} | tr ' ' '\n' | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
-      #sort -u "/tmp/${base_path}/master++" | parallel -j ${split_number} -I {} -- "${ssh_cmd} ${ssh_option} {} ${remote_command}"
    else
       echo ${host_sort} | tr ' ' '\n' | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
-      #sort -u "/tmp/${base_path}/master++" | xargs -r -n 1 -P ${split_number} -I {} -- ${ssh_cmd} ${ssh_option} {} "${remote_command}"
-   fi
+   fi   
 
-   # Clean temporary folder
-   #[ -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"
-   
    exit 0
 fi
 
-
-# split master list in paquet of split_number computer
-#echo ${host_sort} | tr ' ' '\n' | split -l ${split_number} - /tmp/${base_path}/__splitted_
-#sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
+# array
 array_host=($(echo ${host_sort} | tr ' ' '\n'))
 
 # wait is needed by time tmux session open and ssh time connection
@@ -256,8 +229,6 @@ then
    first_delay_time="${delay_time} ${other_delay_time}"
 fi
 
-# loop on each split windows
-#for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
 session='unknown'
 for index in ${!array_host[@]}
 do
@@ -267,13 +238,10 @@ do
    if [ "${verbose}" == 'yes' ]
    then
       echo "Info: host serie ${serie} sub ${subindex} / ${split_number} : ${array_host[${index}]}"
-      #cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;'
-      #sleep 5
    fi
    if [ -n "${log_file}" ]
    then
       echo "Info: host serie ${serie} sub ${subindex} / ${split_number} : ${array_host[${index}]}" >> "${log_file}"
-      #cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;' >> "${log_file}"
       echo "Info: test ssh key on ${array_host[${index}]}" >> "${log_file}"
       ssh -o 'PasswordAuthentication no' -F /dev/null ${array_host[${index}]} exit 2>&1 | grep -v '^Permission denied (publickey,password).' >> "${log_file}"
    fi
@@ -299,24 +267,8 @@ do
       continue
    fi
 
-   #IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
-
-   #if [ -n "${log_file}" ]
-   #then
-   #   for ((i=0 ; i < ${#host[@]} ; i++))
-   #   do
-   #      echo "Info: test ssh key on ${host[$i]}" >> "${log_file}"
-   #      ssh -o 'PasswordAuthentication no' -F /dev/null ${host[$i]} exit 2>&1 | grep -v '^Permission denied (publickey,password).' >> "${log_file}"
-   #   done
-   #fi
-
-
-   #for ((i=1 ; i < ${#host[@]} ; i++))
-   #do
-      # wait ${delay_time} needed in case of ${remote_command}
    tmux splitw -t $session "${ssh_cmd} ${ssh_option} ${array_host[${index}]} ${remote_command}; sleep ${other_delay_time}"
    tmux select-layout tiled > /dev/null
-   #done
 
    if [ ${subindex} -eq ${split_number} -o $((${index} + 1 )) -eq ${#array_host[@]} ]
    then
@@ -359,9 +311,6 @@ do
       tmux attach -t $session
    fi
 done
-
-# Clean temporary folder
-#[ -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"
 
 [ -n "${log_file}" ] && echo "Info: end tssh" >> "${log_file}"
 
