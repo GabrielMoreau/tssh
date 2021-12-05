@@ -420,7 +420,7 @@ The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the defa
 
 =head2 C<delay_time>
 
-See option L<-d|/d-delay-time> above.
+See option L<-d|/d-delay_time> above.
 
 =head2 C<split_number>
 
@@ -435,7 +435,7 @@ This is for example the case with an Active Directory.
 
 =head2 C<ssh_option>
 
-See option L<-o|/o-ssh-option> above.
+See option L<-o|/o-ssh_option> above.
 
 =head2 C<fast>
 
