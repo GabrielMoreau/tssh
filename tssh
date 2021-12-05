@@ -329,12 +329,12 @@ tssh - tmux cluster ssh
 
 =head1 DESCRIPTION
 
-tssh can be use to launch terminal on many computer in parallel with tmux
-multiplexer and ssh.
+C<tssh> can be use to launch terminal on many computer in parallel with C<tmux>
+multiplexer and C<ssh>.
 The tmux windows is splitted automatically.
 If you need more computers on the same windows, you can zoom in and out
-under gnome terminal with Ctrl- or Ctrl+.
-This must be done before launching tssh.
+under gnome terminal with C<Ctrl-> or C<Ctrl+>.
+This must be done before launching C<tssh>.
 
 On the command line, you can put C<host>, C<login@host>, C<clusterssh class>.
 A host or a class can be remove from the list with a dash append
@@ -351,15 +351,15 @@ and move between machine with C<Ctrl^b ArrowKey>.
 
 =head2 C<-w number> 
 
-Windows to open (integer, default 16)
+Number of windows to open per panel (integer, default 16).
 
 =head2 C<-o ssh_option>
 
-Option to pass to ssh
+Option to pass to C<ssh>
 
 =head2 C<-f>
 
-Fast, no nmap scan to eliminate sleeping computer
+Fast, no C<map> is done in order to scan and eliminate sleeping computer.
 
 =head2 C<-d delay_time>
 
@@ -369,19 +369,19 @@ to let C<tmux> the time to open the window (default 0.8).
 
 =head2 C<-c remote_cmd>
 
-Launch the remote command on hosts and exit
+Launch the remote command on hosts and exit.
 
 =head2 C<-p>
 
-Launch in parallel (only with option C<-c>) with command parallel or xargs
+Launch in parallel (only with option C<-c>) with command C<parallel> or C<xargs>.
 
 =head2 C<-i>
 
-No ssh, just ping host
+No C<ssh>, just C<ping> host.
 
 =head2 C<-v>
 
-Verbose
+Verbose.
 
 =head2 C<-l log_file>
 
@@ -389,13 +389,13 @@ Like verbose but append message in the F<log_file>.
 
 =head2 C<-h>
 
-Minimal help
+Minimal help.
 
 
 =head1 CONFIGURATION
 
 The clusterssh config file F<~/.csshrc> is a key values file.
-The "clusters" is mandatory for clusterssh (not tssh) and define the other keys.
+The "clusters" is mandatory for C<clusterssh> (not C<tssh>) and define the other keys.
 Values could be computer list or other key...
 
  clusters = all server s1 s2 s3 node n1 n2 team switch
@@ -420,29 +420,30 @@ The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the defa
 
 =head2 C<delay_time>
 
-See option C<-d>.
+See option L<-d|/#d> above.
 
 =head2 C<split_number>
 
-See option C<-w>.
+See option L<-w|/#w> above.
 
 =head2 C<dyn_domain>
 
-If computer doesn't respond on it's normal IP,
-search also to connect on it with this DNS domain.
-Could be use with DNS dynamic domain where computer register inside automatically.
+If the computer does not respond on its normal IP,
+C<tssh> will also try to connect to this machine with this DNS domain extension.
+This option can be used with a dynamic DNS domain in which the computer is automatically registered.
+This is for example the case with an Active Directory.
 
 =head2 C<ssh_option>
 
-See option C<-o>.
+See option L<-o|/#o> above.
 
 =head2 C<fast>
 
-See option C<-f>.
+See option L<-f|/#f> above.
 
 =head2 C<verbose>
 
-See option C<-v>.
+See option L<-v|/#v> above.
 
 
 =head1 EXAMPLES
@@ -489,9 +490,9 @@ to automatically split your terminal into several small panels.
 C<nmap> is only used for dynamic DNS domain and dynamic scan.
 This is not mandatory for general use.
 
-By default, C<tssh> use C<tput> to know the number of columns and lines of your terminal.
-It takes 10 lines and 40 columns for each windows by default.
-If C<tput> is not installed, the default is 16 windows...
+When it starts, C<tssh> uses C<tput> to find out the number of columns and rows in your terminal.
+By default, it takes 10 rows and 40 columns for each window.
+If C<tput> is not installed, the default is to divide the screen into 16 subwindows...
 
 
 =head1 SEE ALSO

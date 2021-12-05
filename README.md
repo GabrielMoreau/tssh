@@ -20,7 +20,7 @@ man tssh
 
 Sous Debian, ```tssh``` nécessite les paquetages suivants :
 ```bash
-apt-get install tmux wamerican # or wfrench
+apt install tmux wamerican # or wfrench
 ```
 ```wamerican``` (ou equivalent) est nécessaire pour le fichier ```/usr/share/dict/words```.
 Un mot est pioché aléatoirement pour chaque session ```tmux```.
