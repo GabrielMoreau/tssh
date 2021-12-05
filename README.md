@@ -1,79 +1,83 @@
-# Tssh - ClusterSSH en mode terminal (tmux)
+# Tssh - ClusterSSH in terminal mode (tmux)
 
-[tssh](https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh) est un script Bash permettant de lancer N terminaux sur N machines différentes via SSH.
-Contrairement à ClusterSSH qui est en mode graphique,
-```tssh``` utilise ```tmux``` pour multiplexer les sessions SSH dans le même terminal.
+[tssh](https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh)
+is a Bash script allowing to launch N terminals on N different machines via SSH.
+Unlike ClusterSSH which is in graphical mode,
+```tssh``` uses ```tmux``` to multiplex SSH sessions in the same terminal.
 
-Un moyen simple d'utiliser la dernière version de [tssh]([https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh/-/raw/master/tssh?inline=false)
-sans récupérer tout le repository est de faire :
+## Usage
+
+A simple way to use the latest version of
+[tssh]([https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh/-/raw/master/tssh?inline=false)
+without getting the whole repository is to do:
 ```bash
 wget https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh/-/raw/master/tssh?inline=false -O tssh
 chmod u+x ./tssh
 ```
 
-L'utilisation de ```tssh``` est dans le [manuel](https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/).
+The use of ```tssh``` is explained in the online
+[manual](https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/).
 ```bash
 man tssh
 ```
 
-## Dépendances
+### Dependencies
 
-Sous Debian, ```tssh``` nécessite les paquetages suivants :
+Under Debian, ```tssh``` requires the following packages:
 ```bash
 apt install tmux wamerican # or wfrench
 ```
-```wamerican``` (ou equivalent) est nécessaire pour le fichier ```/usr/share/dict/words```.
-Un mot est pioché aléatoirement pour chaque session ```tmux```.
+The ```wamerican``` package (or equivalent) is needed for the ```/usr/share/dict/words``` file.
+A word is randomly selected for each ```tmux``` session.
 
+### Download / Ready-made package
 
-## Repository
+Up-to-date Debian packages can be found at https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/download.
+
+Please note that the Debian packages are very simple and certainly do not check all the Debian Policy rules.
+They are however functional and in production at LEGI.
+
+If someone knows how to make a package in ```rpm``` format
+and gives us the recipe, we will apply it.
+
+## Repository / Contribute
 
 ### Source
 
-L'ensemble du code est sous **licence libre**.
-Le script en ```bash``` est sous GPL version 2 ou plus récente (http://www.gnu.org/licenses/gpl.html).
+The whole code is under **free license**.
+The script in ```bash``` is under GPL version 2 or more recent (http://www.gnu.org/licenses/gpl.html).
 
-Tous les sources sont disponibles sur la forge du campus de Grenoble :
+All the source code is available on the forge of the Grenoble campus:
 https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 
-Les sources sont gérés via Git (GitLab).
-Il est très facile de rester synchronisé par rapport à ces sources.
+The sources are managed via Git (GitLab).
+It is very easy to stay synchronized with these sources.
 
- * la récupération initiale
+ * The initial recovery
 
 ```bash
 git clone ttps://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 ```
- * les mises à jour par la suite
+ * The updates afterwards
 ```bash
 git pull
 ```
 
-### Téléchargement / Download
-
-Des paquets Debian à jour sur https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/download.
-
-À noter que les paquets Debian sont très simples et ne vérifient certainement pas toutes les règles de la charte Debian.
-Il sont cependant fonctionnels et en production au LEGI.
-
-Si une personne sait comment faire un ```rpm```
-et nous donne la recette, nous l’appliquerons.
-
 ### Patch
 
-Il est possible d'avoir un accès en écriture à la forge
-sur demande motivée à [Gabriel Moreau](mailto:Gabriel.Moreau A_ legi.grenoble-inp.fr).
-Pour des questions de temps d'administration et de sécurité,
-la forge n'est pas accessible en écriture sans autorisation.
-Pour des questions de décentralisation du web, d'autonomie
-et de non allégeance au centralisme ambiant (et nord américain),
-nous utilisons notre propre forge...
+It is possible to have a writing access to the project on the forge
+on motivated request to [Gabriel Moreau](mailto:Gabriel.Moreau A_ legi.grenoble-inp.fr).
+For questions of administration time and security,
+the project is not directly accessible in writing without authorization.
+For questions of decentralization of the web, of autonomy
+and non-allegiance to the ambient (and North American) centralism,
+we use the forge of the university campus of Grenoble...
 
-Vous pouvez proposer un patch par courriel d'un fichier particulier via la commande ```diff```.
+You can propose a patch by email of a particular file via the ```diff``` command:
 ```bash
 diff -u tssh.org tssh.new > tssh.patch
 ```
-On applique le patch (après l'avoir lu et relu) via la commande
+The patch is applied (after reading and rereading it) via the command:
 ```bash
 patch -p0 < tssh.patch
 ```
