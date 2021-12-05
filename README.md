@@ -46,17 +46,15 @@ and gives us the recipe, we will apply it.
 
 The whole code is under **free license**.
 The script in ```bash``` is under GPL version 2 or more recent (http://www.gnu.org/licenses/gpl.html).
-
 All the source code is available on the forge of the Grenoble campus:
 https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
-
 The sources are managed via Git (GitLab).
 It is very easy to stay synchronized with these sources.
 
  * The initial recovery
 
 ```bash
-git clone ttps://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
+git clone https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 ```
  * The updates afterwards
 ```bash
