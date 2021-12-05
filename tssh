@@ -5,12 +5,12 @@
 # From http://hd-recording.at/dokuwiki/doku.php?id=linux:tmux#tssh
 
 # Clean when Ctrl^C
-trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"; exit 2;' QUIT INT TERM
+#trap '[ -n "${base_path}" -a -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"; exit 2;' QUIT INT TERM
 
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.3.17'
+VERSION='0.4.1'
 
 function usage() {
    cat <<END_USAGE
@@ -126,7 +126,7 @@ shift $((OPTIND - 1))
 [ -n "${log_file}" ] && echo "Info: begin tssh" >> "${log_file}"
 
 cd /tmp/
-export base_path=$(mktemp -d tssh.XXXXXX)
+#export base_path=$(mktemp -d tssh.XXXXXX)
 #touch "/tmp/${base_path}/master"
 #touch "/tmp/${base_path}/master-"
 #touch "/tmp/${base_path}/master+"
@@ -235,15 +235,16 @@ then
    fi
 
    # Clean temporary folder
-   [ -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"
+   #[ -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"
    
    exit 0
 fi
 
 
 # split master list in paquet of split_number computer
-echo ${host_sort} | tr ' ' '\n' | split -l ${split_number} - /tmp/${base_path}/__splitted_
+#echo ${host_sort} | tr ' ' '\n' | split -l ${split_number} - /tmp/${base_path}/__splitted_
 #sort -u "/tmp/${base_path}/master++" | split -l ${split_number} - /tmp/${base_path}/__splitted_
+array_host=($(echo ${host_sort} | tr ' ' '\n'))
 
 # wait is needed by time tmux session open and ssh time connection
 first_delay_time=0
@@ -256,89 +257,111 @@ then
 fi
 
 # loop on each split windows
-for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
+#for f in $(ls -1 /tmp/${base_path}/ | grep ^__splitted_)
+session='unknown'
+for index in ${!array_host[@]}
 do
+   subindex=$(((${index} % ${split_number}) + 1))
+   serie=$(((${index} / ${split_number}) + 1))
+
    if [ "${verbose}" == 'yes' ]
    then
-      echo "Info: next hosts to be splitted modulo ${split_number}"
-      cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;'
-      sleep 5
+      echo "Info: host serie ${serie} sub ${subindex} / ${split_number} : ${array_host[${index}]}"
+      #cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;'
+      #sleep 5
    fi
    if [ -n "${log_file}" ]
    then
-      echo "Info: next hosts to be splitted modulo ${split_number}" >> "${log_file}"
-      cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;' >> "${log_file}"
+      echo "Info: host serie ${serie} sub ${subindex} / ${split_number} : ${array_host[${index}]}" >> "${log_file}"
+      #cat "/tmp/${base_path}/${f}" | sed -e 's/^/  /;' >> "${log_file}"
+      echo "Info: test ssh key on ${array_host[${index}]}" >> "${log_file}"
+      ssh -o 'PasswordAuthentication no' -F /dev/null ${array_host[${index}]} exit 2>&1 | grep -v '^Permission denied (publickey,password).' >> "${log_file}"
    fi
 
-   session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
-
-   IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
-
-   if [ -n "${log_file}" ]
+   if [ ${subindex} -eq 1 ]
    then
-      for ((i=0 ; i < ${#host[@]} ; i++))
-      do
-         echo "Info: test ssh key on ${host[$i]}" >> "${log_file}"
-         ssh -o 'PasswordAuthentication no' -F /dev/null ${host[$i]} exit 2>&1 | grep -v '^Permission denied (publickey,password).' >> "${log_file}"
-      done
-   fi
+      # First host of the series
+      session=$(shuf -n 1 /usr/share/dict/words | tr -cd "[:alpha:]")
 
-   tmux -2 new-session -d -s $session "${ssh_cmd} ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
-   # wait ${delay_time} second to let new session start...
-   sleep ${delay_time}
-   while (true)
-   do
-      if tmux list-sessions -F "#{session_name}" | grep "^$session$"
-      then
-         break
-      fi
-      tmux -2 new-session -d -s $session "${ssh_cmd} ${ssh_option} ${host[0]} ${remote_command}; sleep ${first_delay_time}"
+      tmux -2 new-session -d -s $session "${ssh_cmd} ${ssh_option} ${array_host[${index}]} ${remote_command}; sleep ${first_delay_time}"
+      # wait ${delay_time} second to let new session start...
       sleep ${delay_time}
-   done
+      while (true)
+      do
+         if tmux list-sessions -F "#{session_name}" | grep "^$session$"
+         then
+            break
+         fi
+         tmux -2 new-session -d -s $session "${ssh_cmd} ${ssh_option} ${array_host[${index}]} ${remote_command}; sleep ${first_delay_time}"
+         sleep ${delay_time}
+      done
 
-   for ((i=1 ; i < ${#host[@]} ; i++))
-   do
+      continue
+   fi
+
+   #IFS=$'\n' host=($(cat "/tmp/${base_path}/${f}"))
+
+   #if [ -n "${log_file}" ]
+   #then
+   #   for ((i=0 ; i < ${#host[@]} ; i++))
+   #   do
+   #      echo "Info: test ssh key on ${host[$i]}" >> "${log_file}"
+   #      ssh -o 'PasswordAuthentication no' -F /dev/null ${host[$i]} exit 2>&1 | grep -v '^Permission denied (publickey,password).' >> "${log_file}"
+   #   done
+   #fi
+
+
+   #for ((i=1 ; i < ${#host[@]} ; i++))
+   #do
       # wait ${delay_time} needed in case of ${remote_command}
-      tmux splitw -t $session "${ssh_cmd} ${ssh_option} ${host[$i]} ${remote_command}; sleep ${other_delay_time}"
-      tmux select-layout tiled
-   done
+   tmux splitw -t $session "${ssh_cmd} ${ssh_option} ${array_host[${index}]} ${remote_command}; sleep ${other_delay_time}"
+   tmux select-layout tiled > /dev/null
+   #done
 
-   tmux set-window-option synchronize-panes on  > /dev/null
-   tmux set-window-option -g utf8 on            > /dev/null
-   tmux set -g default-terminal screen-256color > /dev/null
-   #tmux set-option -g set-clipboard on
+   if [ ${subindex} -eq ${split_number} -o $((${index} + 1 )) -eq ${#array_host[@]} ]
+   then
+      # Last of the series
+      tmux set-window-option synchronize-panes on  > /dev/null
+      tmux set-window-option -g utf8 on            > /dev/null
+      tmux set -g default-terminal screen-256color > /dev/null
+      #tmux set-option -g set-clipboard on
  
-   # Sane scrolling
-   #tmux set -g mode-mouse on
-   #tmux set -g mouse-resize-pane on
-   #tmux set -g mouse-select-pane on
-   #tmux set -g mouse-select-window on
+      # Sane scrolling
+      #tmux set -g mode-mouse on
+      #tmux set -g mouse-resize-pane on
+      #tmux set -g mouse-select-pane on
+      #tmux set -g mouse-select-window on
  
-   #set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+      #set -g terminal-overrides 'xterm*:smcup@:rmcup@'
  
-   # toggle mouse mode to allow mouse copy/paste
-   # set mouse on with prefix m
-   tmux bind m \
-      set -g mode-mouse on \; \
-      set -g mouse-select-pane on \; \
-      display 'Mouse: ON' > /dev/null
-      # set -g mouse-resize-pane on \; \
-      #set -g mouse-select-window on \; \
-   # set mouse off with prefix M
-   tmux bind M \
-      set -g mode-mouse off \; \
-      set -g mouse-select-pane off \; \
-      display 'Mouse: OFF' > /dev/null
-      #set -g mouse-resize-pane off \; \
-      #set -g mouse-select-window off \; \
-   # toggle Broadcast
-   tmux bind b set-window-option synchronize-panes
+      # toggle mouse mode to allow mouse copy/paste
+      # set mouse on with prefix m
+      tmux bind m \
+         set -g mode-mouse on \; \
+         set -g mouse-select-pane on \; \
+         display 'Mouse: ON' > /dev/null
+         # set -g mouse-resize-pane on \; \
+         #set -g mouse-select-window on \; \
+      # set mouse off with prefix M
+      tmux bind M \
+         set -g mode-mouse off \; \
+         set -g mouse-select-pane off \; \
+         display 'Mouse: OFF' > /dev/null
+         #set -g mouse-resize-pane off \; \
+         #set -g mouse-select-window off \; \
+      # toggle Broadcast
+      tmux bind b set-window-option synchronize-panes
 
-   tmux attach -t $session
+      if [ "${verbose}" == 'yes' ]
+      then
+         echo "Info: attach session: $session"
+      fi
+      tmux attach -t $session
+   fi
 done
 
 # Clean temporary folder
-[ -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"
+#[ -d "/tmp/${base_path}" ] && rm -rf "/tmp/${base_path}"
 
 [ -n "${log_file}" ] && echo "Info: end tssh" >> "${log_file}"
 
