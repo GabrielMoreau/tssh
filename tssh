@@ -420,11 +420,11 @@ The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the defa
 
 =head2 C<delay_time>
 
-See option L<-d|/#d> above.
+See option L<-d|/d-delay-time> above.
 
 =head2 C<split_number>
 
-See option L<-w|/#w> above.
+See option L<-w|/w-number> above.
 
 =head2 C<dyn_domain>
 
@@ -435,15 +435,15 @@ This is for example the case with an Active Directory.
 
 =head2 C<ssh_option>
 
-See option L<-o|/#o> above.
+See option L<-o|/o-ssh-option> above.
 
 =head2 C<fast>
 
-See option L<-f|/#f> above.
+See option L<-f|/f> above.
 
 =head2 C<verbose>
 
-See option L<-v|/#v> above.
+See option L<-v|/v> above.
 
 
 =head1 EXAMPLES
