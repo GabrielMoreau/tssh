@@ -7,7 +7,7 @@ MANDIR=/usr/share/man/man1
 SHAREDIR=/usr/share/tssh
 COMPDIR=/etc/bash_completion.d
 
-.PHONY: all ignore install update sync upload stat help pkg pages
+.PHONY: all ignore install update sync upload stat help pkg pages clean
 
 all:
 	pod2man tssh | gzip > tssh.1.gz
@@ -66,3 +66,7 @@ help:
 ignore: svnignore.txt
 	svn propset svn:ignore -F svnignore.txt .
 	svn propset svn:keywords "Id" tssh
+
+clean:
+	rm -f tssh_*_all.deb tssh.1.gz tssh.html pod2htmd.tmp
+	rm -rf public
