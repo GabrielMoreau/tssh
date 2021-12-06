@@ -5,6 +5,8 @@ is a Bash script allowing to launch N terminals on N different machines via SSH.
 Unlike ClusterSSH which is in graphical mode,
 ```tssh``` uses ```tmux``` to multiplex SSH sessions in the same terminal.
 
+More on [ClusterSSH](https://github.com/duncs/clusterssh).
+
 ## Usage
 
 A simple way to use the latest version of
@@ -34,7 +36,8 @@ A word is randomly selected for each ```tmux``` session.
 
 Up-to-date Debian packages can be found at https://legi.gricad-pages.univ-grenoble-alpes.fr/soft/trokata/tssh/download.
 
-Please note that the Debian packages are very simple and certainly do not check all the Debian Policy rules.
+Please note that the Debian packages are very simple
+and certainly do not check all the Debian Policy rules and quality.
 They are however functional and in production at LEGI.
 
 If someone knows how to make a package in ```rpm``` format
@@ -52,7 +55,6 @@ The sources are managed via Git (GitLab).
 It is very easy to stay synchronized with these sources.
 
  * The initial recovery
-
 ```bash
 git clone https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 ```
@@ -60,6 +62,9 @@ git clone https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 ```bash
 git pull
 ```
+ * Contribute.
+   It is possible to contribute by proposing pull requests,
+   merge requests or simply old fashioned patches.
 
 ### Patch
 
