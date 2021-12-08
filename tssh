@@ -15,7 +15,7 @@ tssh - tmux cluster ssh
 
  tssh [-w number] [-f] [-h] [-p] [-i] [-t] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
-   -w windows     windows to open (integer, default 16)
+   -w window      number of windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
    -f             fast, no nmap scan to eliminate sleeping computer
    -v             verbose
@@ -30,6 +30,16 @@ tssh - tmux cluster ssh
 VERSION ${VERSION}
 END_USAGE
    }
+
+OPT_SHORT=w:o:d:c:fvl:pith
+OPT_LONG=window:,ssh-option:,delay:,command:,fast,verbose,log:,parallel,ping,telnet,help
+OPT_PARSED=$(getopt --options $OPT_SHORT --longoptions $OPT_LONG --name "$0" -- "$@")
+if [[ $? -ne 0 ]]
+then
+    usage
+    exit 2
+fi
+eval set -- "${OPT_PARSED}"
 
 export delay_time=0.8
 export remote_command=''
@@ -51,79 +61,93 @@ then
 fi
 
 # get options
-if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:o:d:c:fvl:pith" options
+while true
 do
-   case ${options} in
-      w)
-         if echo ${OPTARG} | egrep -q '^[[:digit:]]+$' && [ ${OPTARG} -gt 0 ]
+   case "$1" in
+      -w|--window)
+         if echo $2 | egrep -q '^[[:digit:]]+$' && [ $2 -gt 0 ]
          then
-            export split_number=${OPTARG}
+            export split_number=$2
+            shift 2
          else
             usage
             exit 4
          fi
          ;;
-      d)
-         if echo ${OPTARG} | egrep -q '^[[:digit:]]+$' && [ ${OPTARG} -gt 0 ]
+      -d|--delay)
+         if echo $2 | egrep -q '^[[:digit:]]+$' && [ $2 -gt 0 ]
          then
-            export delay_time=${OPTARG}
+            export delay_time=$2
+            shift 2
          else
             usage
             exit 5
          fi         
          ;;
-      c)
-         if echo ${OPTARG} | egrep -q '[[:alpha:]]'
+      -c|--command)
+         if echo $2 | egrep -q '[[:alpha:]]'
          then
-            export remote_command=${OPTARG}
+            export remote_command=$2
+            shift 2
          else
             usage
             exit 6
          fi         
          ;;
-      p)
+      -p|--parallel)
          export parallel='yes'
+         shift
          ;;
-      i)
+      -i|--ping)
          export ssh_cmd=ping
          export ssh_option=''
+         shift
          ;;
-      t)
+      -t|--telnet)
          export ssh_cmd=telnet
          export ssh_option=''
+         shift
          ;;
-      o)
-         if echo ${OPTARG} | egrep -q '[[:alpha:][:digit:]]'
+      -o|--ssh-option)
+         if echo $2 | egrep -q '[[:alpha:][:digit:]]'
          then
-            export ssh_option=${OPTARG}
+            export ssh_option=$2
+            shift 2
          else
             usage
             exit 7
          fi
          ;;
-      f)
+      -f|--fast)
          export fast='yes'
+         shift
          ;;
-      v)
+      -v|--verbose)
          export verbose='yes'
+         shift
          ;;
-      l)
-         if echo ${OPTARG} | egrep -q '^/'
+      -l|--log)
+         if echo $2 | egrep -q '^/'
          then
-            export log_file=${OPTARG}
+            export log_file=$2
          else
-            export log_file="${PWD}/${OPTARG}"
+            export log_file="${PWD}/$2"
          fi
+         shift 2
          ;;
-      h|*)
+      --)
+         shift
+         break
+         ;;
+      -h|--help|*)
          usage
          exit 3
          ;;
    esac
 done
-shift $((OPTIND - 1))
-[[ $1 = "--" ]] && shift
+
+# need a computer or more
+if [ $# -eq 0 ]; then usage; exit 8; fi 
 
 [ -n "${log_file}" ] && echo "Info: begin tssh" >> "${log_file}"
 
