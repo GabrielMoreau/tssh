@@ -40,8 +40,8 @@ Version: ${CODE_VERSION}-${PKG_VERSION}
 Section: admin
 Tag: admin::cluster, implemented-in::bash, interface::commandline, interface::text-mode, network::client, protocol::ssh, role::program, use::login
 Priority: optional
-Depends: tmux, openssh-client, ncurses-bin, findutils, grep, wamerican | wfrench | wspanish | witalian | wbritish | wngerman | wogerman
-Suggests: nmap, parallel
+Depends: tmux, openssh-client, ncurses-bin, util-linux, findutils, grep, wamerican | wfrench | wspanish | witalian | wbritish | wngerman | wogerman
+Suggests: nmap, parallel, telnet, iputils-ping | inetutils-ping
 Architecture: all
 Installed-Size: $(du -ks ${tmp_folder}|cut -f 1)
 Maintainer: Gabriel Moreau <Gabriel.Moreau@univ-grenoble-alpes.fr>
