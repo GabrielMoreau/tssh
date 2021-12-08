@@ -13,7 +13,7 @@ function usage() {
    cat <<END_USAGE
 tssh - tmux cluster ssh
 
- tssh [-w number] [-f] [-h] [-p] [-i] [-t] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [--window|-w number] [--fast|-f] [--help|-h] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
    -w window      number of windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
@@ -354,7 +354,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [-w number] [-f] [-h] [-p] [-i] [-t] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [--window|-w number] [--fast|-f] [--help|-h] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 DESCRIPTION
 
