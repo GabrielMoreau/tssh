@@ -7,13 +7,13 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.3'
+VERSION='0.4.4'
 
 function usage() {
    cat <<END_USAGE
 tssh - tmux cluster ssh
 
- tssh [-w number] [-f] [-h] [-p] [-i] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-h] [-p] [-i] [-t] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
    -w windows     windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
@@ -23,6 +23,7 @@ tssh - tmux cluster ssh
    -c remote_cmd  launch the remote command on hosts and exit
    -p             launch in parallel (only with -c) with command parallel or xargs
    -i             just ping, no ssh
+   -t             use telnet instead of ssh
    -h             help
    -l log_file    verbose in log file and test ssh key
 
@@ -51,7 +52,7 @@ fi
 
 # get options
 if [ $# -eq 0 ]; then usage; exit 1; fi 
-while getopts "w:o:d:c:fvl:pih" options
+while getopts "w:o:d:c:fvl:pith" options
 do
    case ${options} in
       w)
@@ -86,6 +87,10 @@ do
          ;;
       i)
          export ssh_cmd=ping
+         export ssh_option=''
+         ;;
+      t)
+         export ssh_cmd=telnet
          export ssh_option=''
          ;;
       o)
@@ -325,7 +330,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [-w number] [-f] [-h] [-p] [-i] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [-w number] [-f] [-h] [-p] [-i] [-t] [-v] [-l log_file] [-d delay_time] [-c remote_cmd] [-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 DESCRIPTION
 
@@ -378,6 +383,10 @@ Launch in parallel (only with option C<-c>) with command C<parallel> or C<xargs>
 =head2 C<-i>
 
 No C<ssh>, just C<ping> host.
+
+=head2 C<-t>
+
+Use C<telnet> instead of C<ssh>.
 
 =head2 C<-v>
 
