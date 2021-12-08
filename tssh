@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.4'
+VERSION='0.4.5'
 
 function usage() {
    cat <<END_USAGE
@@ -44,6 +44,7 @@ eval set -- "${OPT_PARSED}"
 export delay_time=0.8
 export remote_command=''
 export ssh_option=''
+export ssh_port=22
 export ssh_cmd=ssh
 export split_number=16
 if which tput > /dev/null
@@ -106,6 +107,7 @@ do
       -t|--telnet)
          export ssh_cmd=telnet
          export ssh_option=''
+         export ssh_port=20
          shift
          ;;
       -o|--ssh-option)
@@ -190,9 +192,9 @@ get_host_list () {
                [ -n "${log_file}" ]      && echo "Warning: ${justhost} does not exists" >> "${log_file}"
                continue
             fi
-            if ! nmap -p 22 -sT -PN ${justhost} | grep -q '\bopen\b'
+            if ! nmap -p ${ssh_port} -sT -PN ${justhost} | grep -q '\bopen\b'
             then
-               if host ${justhost}.${dyn_domain} | grep -q 'not found' || ! nmap -p 22 -sT -PN ${justhost}.${dyn_domain} | grep -q '\bopen\b'
+               if host ${justhost}.${dyn_domain} | grep -q 'not found' || ! nmap -p ${ssh_port} -sT -PN ${justhost}.${dyn_domain} | grep -q '\bopen\b'
                then
                   [ "${verbose}" == 'yes' ] && echo "Warning: ${justhost} is down"
                   [ -n "${log_file}" ]      && echo "Warning: ${justhost} is down" >> "${log_file}"
@@ -448,6 +450,7 @@ The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the defa
  #export split_number=16
  export dyn_domain='mycompagny.local'
  #export ssh_option=''
+ #export ssh_port=22
  #export fast='yes'
  #export verbose='yes'
 
