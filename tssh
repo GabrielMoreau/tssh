@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.5'
+VERSION='0.4.6'
 
 function usage() {
    cat <<END_USAGE
@@ -292,12 +292,10 @@ do
          tmux -2 new-session -d -s ${session} "${ssh_cmd} ${ssh_option} ${array_host[${index}]} ${remote_command}; sleep ${first_delay_time}"
          sleep ${delay_time}
       done
-
-      continue
+   else
+      tmux splitw -t ${session} "${ssh_cmd} ${ssh_option} ${array_host[${index}]} ${remote_command}; sleep ${other_delay_time}"
+      tmux select-layout tiled > /dev/null
    fi
-
-   tmux splitw -t ${session} "${ssh_cmd} ${ssh_option} ${array_host[${index}]} ${remote_command}; sleep ${other_delay_time}"
-   tmux select-layout tiled > /dev/null
 
    if [ ${subindex} -eq ${split_number} -o $((${index} + 1 )) -eq ${#array_host[@]} ]
    then
