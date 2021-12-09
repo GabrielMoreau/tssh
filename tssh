@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.6'
+VERSION='0.4.7'
 
 function usage() {
    cat <<END_USAGE
@@ -44,7 +44,7 @@ eval set -- "${OPT_PARSED}"
 export delay_time=0.8
 export remote_command=''
 export ssh_option=''
-export ssh_port=22
+export ssh_port=22 # ssh default port
 export ssh_cmd=ssh
 export split_number=16
 if which tput > /dev/null
@@ -107,7 +107,7 @@ do
       -t|--telnet)
          export ssh_cmd=telnet
          export ssh_option=''
-         export ssh_port=20
+         export ssh_port=23 # telnet default port
          shift
          ;;
       -o|--ssh-option)
