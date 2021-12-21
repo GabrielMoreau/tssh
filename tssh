@@ -7,13 +7,13 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.7'
+VERSION='0.4.8'
 
 function usage() {
    cat <<END_USAGE
 tssh - tmux cluster ssh
 
- tssh [--window|-w number] [--fast|-f] [--help|-h] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [--window|-w number] [--fast|-f] [--help|-h] [--version|-V] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
    -w window      number of windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
@@ -31,8 +31,8 @@ VERSION ${VERSION}
 END_USAGE
    }
 
-OPT_SHORT=w:o:d:c:fvl:pith
-OPT_LONG=window:,ssh-option:,delay:,command:,fast,verbose,log:,parallel,ping,telnet,help
+OPT_SHORT=w:o:d:c:fvl:pitVh
+OPT_LONG=window:,ssh-option:,delay:,command:,fast,verbose,log:,parallel,ping,telnet,version,help
 OPT_PARSED=$(getopt --options $OPT_SHORT --longoptions $OPT_LONG --name "$0" -- "$@")
 if [[ $? -ne 0 ]]
 then
@@ -141,6 +141,10 @@ do
          shift
          break
          ;;
+      -V|--version)
+         echo "VERSION ${VERSION}"
+         exit
+         ;;
       -h|--help|*)
          usage
          exit 3
@@ -155,6 +159,9 @@ if [ $# -eq 0 ]; then usage; exit 8; fi
 
 # hash table
 declare -A ghkey
+
+#get_just_host () {
+#   }
 
 get_host_list () {
    local default_mode=''
@@ -354,7 +361,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [--window|-w number] [--fast|-f] [--help|-h] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [--window|-w number] [--fast|-f] [--help|-h] [--version|-V] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 DESCRIPTION
 
@@ -423,6 +430,10 @@ Like verbose but append message in the F<log_file>.
 =head2 C<-h>
 
 Minimal help.
+
+=head2 C<--version|-V>
+
+Print software version.
 
 
 =head1 CONFIGURATION
