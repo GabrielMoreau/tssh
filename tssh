@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.8'
+VERSION='0.4.9'
 
 function usage() {
    cat <<END_USAGE
@@ -24,6 +24,7 @@ tssh - tmux cluster ssh
    -p             launch in parallel (only with -c) with command parallel or xargs
    -i             just ping, no ssh
    -t             use telnet instead of ssh
+   -V             version
    -h             help
    -l log_file    verbose in log file and test ssh key
 
@@ -385,49 +386,49 @@ and move between machine with C<Ctrl^b ArrowKey>.
 
 =head1 OPTIONS
 
-=head2 C<-w number> 
+=head2 C<--window|-w number> 
 
 Number of windows to open per panel (integer, default 16).
 
-=head2 C<-o ssh_option>
+=head2 C<--ssh-option|-o ssh_option>
 
 Option to pass to C<ssh>
 
-=head2 C<-f>
+=head2 C<--fast|-f>
 
 Fast, no C<map> is done in order to scan and eliminate sleeping computer.
 
-=head2 C<-d delay_time>
+=head2 C<--delay|-d delay_time>
 
 When use C<tmux> context,
 add a small delay in second before lauching the second shell
 to let C<tmux> the time to open the window (default 0.8).
 
-=head2 C<-c remote_cmd>
+=head2 C<--command|-c remote_cmd>
 
 Launch the remote command on hosts and exit.
 
-=head2 C<-p>
+=head2 C<--parallel|-p>
 
 Launch in parallel (only with option C<-c>) with command C<parallel> or C<xargs>.
 
-=head2 C<-i>
+=head2 C<--ping|-i>
 
 No C<ssh>, just C<ping> host.
 
-=head2 C<-t>
+=head2 C<--telnet|-t>
 
 Use C<telnet> instead of C<ssh>.
 
-=head2 C<-v>
+=head2 C<--verbose|-v>
 
 Verbose.
 
-=head2 C<-l log_file>
+=head2 C<--log|-l log_file>
 
 Like verbose but append message in the F<log_file>.
 
-=head2 C<-h>
+=head2 C<--help|-h>
 
 Minimal help.
 
@@ -465,11 +466,11 @@ The C<tssh> config file (F<~/.config/tssh/config.sh>) can be use change the defa
 
 =head2 C<delay_time>
 
-See option L<-d|/d-delay_time> above.
+See option L<-d|/delay--d-delay-time> above.
 
 =head2 C<split_number>
 
-See option L<-w|/w-number> above.
+See option L<-w|/window--w-number> above.
 
 =head2 C<dyn_domain>
 
@@ -480,15 +481,15 @@ This is for example the case with an Active Directory.
 
 =head2 C<ssh_option>
 
-See option L<-o|/o-ssh_option> above.
+See option L<-o|/ssh-option--o-ssh-option> above.
 
 =head2 C<fast>
 
-See option L<-f|/f> above.
+See option L<-f|/fast--f> above.
 
 =head2 C<verbose>
 
-See option L<-v|/v> above.
+See option L<-v|/verbose--v> above.
 
 
 =head1 EXAMPLES
