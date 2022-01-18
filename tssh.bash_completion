@@ -9,11 +9,23 @@ _tssh() {
    cur="${COMP_WORDS[COMP_CWORD]}"
    prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-   if [[ "$cur" == '-*' || $COMP_CWORD -gt 1 ]]
+   case $prev in
+      -l|--log)
+         COMPREPLY=($(compgen -f -- "$cur"|grep -v -f <(compgen  -d --|sed -e 's/^/^/;s/$/\$/;'); compgen -d -S / -- "$cur"))
+         return 0
+         ;;
+   esac
+
+   if [[ "$cur" == '-*' ]]
    then
-      COMPREPLY=($(compgen -W "$(tssh -h|grep '^ tssh'|sed -e 's/[\[]/\n/g;'|grep -- '^-'|cut -f 1 -d ']'|cut -f 1 -d ' '|sed -e 's/|/ /g;'|xargs echo -n)" -- "$cur"))
+      COMPREPLY=($(compgen -W "$(tssh --help|grep '^ tssh'|sed -e 's/[\[]/\n/g;'|grep -- '^-'|cut -f 1 -d ']'|cut -f 1 -d ' '|sed -e 's/|/ /g;'|xargs echo -n)" -- "$cur"))
+   #elif [[ $COMP_CWORD -gt 1 && "$prev" != '-*' ]]
+   #then
+   #   COMPREPLY=($(compgen -W "$(tr '\n' ' '<$HOME/.csshrc|sed -e 's/=/ /g;s/[[:space:]][[:space:]]*/ /g')" -- "$cur"))
    else
-      COMPREPLY=($(compgen -W "$(tssh -h|grep '^ tssh'|sed -e 's/[\[]/\n/g;'|grep -- '^-'|cut -f 1 -d ']'|cut -f 1 -d ' '|sed -e 's/|/ /g;'|xargs echo -n)" -- "$cur"))
+      COMPREPLY=($(compgen -W "$((tssh --help|grep '^ tssh'|sed -e 's/[\[]/\n/g;'|grep -- '^-'|cut -f 1 -d ']'|cut -f 1 -d ' '|sed -e 's/|/ /g;';
+                                  tr '\n' ' '<$HOME/.csshrc|sed -e 's/=/ /g;s/[[:space:]][[:space:]]*/ /g'
+                                 ) | xargs echo -n)" -- "$cur"))
    fi
 
    } && complete -F _tssh tssh

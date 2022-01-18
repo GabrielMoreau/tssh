@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.9'
+VERSION='0.4.10'
 
 function usage() {
    cat <<END_USAGE
