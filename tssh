@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.11'
+VERSION='0.4.12'
 
 function usage() {
    cat <<END_USAGE
@@ -229,20 +229,20 @@ get_host_list () {
 declare -fx get_host_list
 
 get_host_list $@
-ghkey["master"]=${ghkey["master"]}${ghkey["master+"]}
+ghkey['master~']=${ghkey['master~']}${ghkey['master+']}
 for f in ${ghkey["master-"]}
 do
-   echo " "${ghkey["master+"]}" " | grep "[[:space:]]${f}[[:space:]]" && continue
-   ghkey["master--"]=${ghkey["master--"]}" ${f} "
+   echo " "${ghkey['master+']}" " | grep "[[:space:]]${f}[[:space:]]" && continue
+   ghkey['master--']=${ghkey['master--']}" ${f} "
 done
-for f in ${ghkey["master"]}
+for f in ${ghkey['master~']}
 do
-   echo " "${ghkey["master--"]}" " | grep "[[:space:]]${f}[[:space:]]" && continue
-   ghkey["master++"]=${ghkey["master++"]}" ${f} "
+   echo " "${ghkey['master--']}" " | grep "[[:space:]]${f}[[:space:]]" && continue
+   ghkey['master++']=${ghkey['master++']}" ${f} "
 done
 
 # array
-array_host=($(echo ${ghkey["master++"]} | tr ' ' '\n' | sort -u))
+array_host=($(echo ${ghkey['master++']} | tr ' ' '\n' | sort -u))
 
 if [ "${parallel}" == 'yes' -a -n "${remote_command}" ]
 then
