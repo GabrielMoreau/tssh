@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.10'
+VERSION='0.4.11'
 
 function usage() {
    cat <<END_USAGE
@@ -165,7 +165,7 @@ declare -A ghkey
 #   }
 
 get_host_list () {
-   local default_mode=''
+   local default_mode='~'
 
    # set local mode
    if echo $1 | grep -q -- ^--mode=
