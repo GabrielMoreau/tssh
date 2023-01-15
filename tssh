@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.12'
+VERSION='0.4.13'
 
 function usage() {
    cat <<END_USAGE
@@ -50,7 +50,9 @@ export ssh_cmd=ssh
 export split_number=16
 if which tput > /dev/null
 then
-   export split_number=$(( ($(tput  lines)/ 10) * ($(tput  cols)/ 40) ))
+   export split_number=$(( ($(tput lines)/ 10) * ($(tput cols)/ 40) ))
+else
+   export split_number=$(( ($(stty size | cut -f 1 -d ' ')/ 10) * ($(stty size | cut -f 2 -d ' ')/ 40) ))
 fi
 
 export dyn_domain=''
@@ -538,7 +540,7 @@ This is not mandatory for general use.
 
 When it starts, C<tssh> uses C<tput> to find out the number of columns and rows in your terminal.
 By default, it takes 10 rows and 40 columns for each window.
-If C<tput> is not installed, the default is to divide the screen into 16 subwindows...
+If C<tput> is not installed, the C<stty> command is used with the C<size> option...
 
 
 =head1 SEE ALSO
@@ -565,5 +567,5 @@ Written by Gabriel Moreau, Grenoble - France
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2022, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
+Copyright (C) 2014-2023, LEGI UMR 5519 / CNRS UGA G-INP, Grenoble, France
 Licence : GNU GPL version 2 or later
