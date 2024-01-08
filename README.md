@@ -54,6 +54,9 @@ https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
 The sources are managed via Git (GitLab).
 It is very easy to stay synchronized with these sources.
 
+Note: The master Git repository in on the [GRICAD Gitlab](https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh).
+Other Git repository are mirror or fork.
+
  * The initial recovery
 ```bash
 git clone https://gricad-gitlab.univ-grenoble-alpes.fr/legi/soft/trokata/tssh
@@ -69,7 +72,7 @@ git pull
 ### Patch
 
 It is possible to have a writing access to the project on the forge
-on motivated request to [Gabriel Moreau](mailto:Gabriel.Moreau A_ legi.grenoble-inp.fr).
+on motivated request to [Gabriel Moreau](mailto:Gabriel.Moreau__AT__univ-grenoble-alpes.fr).
 For questions of administration time and security,
 the project is not directly accessible in writing without authorization.
 For questions of decentralization of the web, of autonomy
