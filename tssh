@@ -7,7 +7,9 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.14'
+VERSION='0.4.15'
+
+################################################################
 
 function usage() {
    cat <<END_USAGE
@@ -31,6 +33,8 @@ tssh - tmux cluster ssh
 VERSION ${VERSION}
 END_USAGE
    }
+
+################################################################
 
 OPT_SHORT=w:o:d:c:fvl:pitVh
 OPT_LONG=window:,ssh-option:,delay:,command:,fast,verbose,log:,parallel,ping,telnet,version,help
@@ -166,6 +170,8 @@ declare -A ghkey
 #get_just_host () {
 #   }
 
+################################################################
+
 get_host_list () {
    local default_mode='~'
 
@@ -188,7 +194,19 @@ get_host_list () {
 
       # short host without login part if any
       local justhost=${host#*@}
-      
+
+      # case of localhost
+      if [ "${justhost}" == "${HOSTNAME}" ]
+      then
+         justhost='localhost'
+         if [[ "${host}" =~ '@' ]]
+         then
+            host="${host/@*}@localhost"
+         else
+            host='localhost'
+         fi
+      fi
+
       local cluster=$(grep "^${justhost}\b" ${HOME}/.csshrc | cut -f 2 -d '=' | sed -e 's/^[[:space:]]*//;')
       if [ "${cluster}" == "" ]
       then
@@ -229,6 +247,8 @@ get_host_list () {
    done
    }
 declare -fx get_host_list
+
+################################################################
 
 get_host_list $@
 ghkey['master~']=${ghkey['master~']}${ghkey['master+']}
