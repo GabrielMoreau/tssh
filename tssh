@@ -7,7 +7,7 @@
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 export LANG=C
 
-VERSION='0.4.15'
+VERSION='0.4.16'
 
 ################################################################
 
@@ -15,7 +15,7 @@ function usage() {
    cat <<END_USAGE
 tssh - tmux cluster ssh
 
- tssh [--window|-w number] [--fast|-f] [--help|-h] [--version|-V] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [--window|-w number] [--fast|-f] [--help|-h] [--version|-V] [--parallel|-p] [--ping|-i] [--telnet|-t] [--print|-P] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
    -w window      number of windows to open (integer, default 16)
    -o ssh_option  option to pass to ssh
@@ -109,6 +109,11 @@ do
       -i|--ping)
          export ssh_cmd=ping
          export ssh_option=''
+         shift
+         ;;
+      -P|--print)
+         export remote_command='echo ${HOSTNAME}'
+         export parallel='yes'
          shift
          ;;
       -t|--telnet)
@@ -384,7 +389,7 @@ tssh - tmux cluster ssh
 
 =head1 SYNOPSIS
 
- tssh [--window|-w number] [--fast|-f] [--help|-h] [--version|-V] [--parallel|-p] [--ping|-i] [--telnet|-t] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
+ tssh [--window|-w number] [--fast|-f] [--help|-h] [--version|-V] [--parallel|-p] [--ping|-i] [--telnet|-t] [--print|-P] [--verbose|-v] [--log|-l log_file] [--delay|-d delay_time] [--command|-c remote_cmd] [--ssh-option|-o ssh_option] <host1> <host2> <clusterssh class>... <hostM>- <hostN>+
 
 =head1 DESCRIPTION
 
@@ -441,6 +446,13 @@ No C<ssh>, just C<ping> host.
 =head2 C<--telnet|-t>
 
 Use C<telnet> instead of C<ssh>.
+
+=head2 C<--print|-P>
+
+Print the list of host.
+This command is pretty equivalent to:
+
+ tssh -p -c 'echo ${HOSTNAME}'
 
 =head2 C<--verbose|-v>
 
